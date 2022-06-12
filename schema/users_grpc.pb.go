@@ -26,6 +26,8 @@ type UsersClient interface {
 	AddUser(ctx context.Context, in *AddUserRequest, opts ...grpc.CallOption) (*AddUserResponse, error)
 	// GetUser - get user by id.
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
+	// GetUserByEmail - get user by email.
+	GetUserByEmail(ctx context.Context, in *GetUserByEmailRequest, opts ...grpc.CallOption) (*GetUserByEmailResponse, error)
 	// IsUserWithEmailExists - get user by email
 	IsUserWithEmailExists(ctx context.Context, in *IsUserWithEmailExistsRequest, opts ...grpc.CallOption) (*IsUserWithEmailExistsResponse, error)
 	// IsValidUserCredentials - check if user with given credentials exists.
@@ -54,6 +56,15 @@ func (c *usersClient) AddUser(ctx context.Context, in *AddUserRequest, opts ...g
 func (c *usersClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error) {
 	out := new(GetUserResponse)
 	err := c.cc.Invoke(ctx, "/kanban_tt.schema.Users/GetUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *usersClient) GetUserByEmail(ctx context.Context, in *GetUserByEmailRequest, opts ...grpc.CallOption) (*GetUserByEmailResponse, error) {
+	out := new(GetUserByEmailResponse)
+	err := c.cc.Invoke(ctx, "/kanban_tt.schema.Users/GetUserByEmail", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -95,6 +106,8 @@ type UsersServer interface {
 	AddUser(context.Context, *AddUserRequest) (*AddUserResponse, error)
 	// GetUser - get user by id.
 	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
+	// GetUserByEmail - get user by email.
+	GetUserByEmail(context.Context, *GetUserByEmailRequest) (*GetUserByEmailResponse, error)
 	// IsUserWithEmailExists - get user by email
 	IsUserWithEmailExists(context.Context, *IsUserWithEmailExistsRequest) (*IsUserWithEmailExistsResponse, error)
 	// IsValidUserCredentials - check if user with given credentials exists.
@@ -113,6 +126,9 @@ func (UnimplementedUsersServer) AddUser(context.Context, *AddUserRequest) (*AddU
 }
 func (UnimplementedUsersServer) GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
+}
+func (UnimplementedUsersServer) GetUserByEmail(context.Context, *GetUserByEmailRequest) (*GetUserByEmailResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserByEmail not implemented")
 }
 func (UnimplementedUsersServer) IsUserWithEmailExists(context.Context, *IsUserWithEmailExistsRequest) (*IsUserWithEmailExistsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IsUserWithEmailExists not implemented")
@@ -168,6 +184,24 @@ func _Users_GetUser_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UsersServer).GetUser(ctx, req.(*GetUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Users_GetUserByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserByEmailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServer).GetUserByEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kanban_tt.schema.Users/GetUserByEmail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServer).GetUserByEmail(ctx, req.(*GetUserByEmailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -240,6 +274,10 @@ var Users_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUser",
 			Handler:    _Users_GetUser_Handler,
+		},
+		{
+			MethodName: "GetUserByEmail",
+			Handler:    _Users_GetUserByEmail_Handler,
 		},
 		{
 			MethodName: "IsUserWithEmailExists",
