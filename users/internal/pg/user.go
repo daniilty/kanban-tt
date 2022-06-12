@@ -1,6 +1,8 @@
 package pg
 
-import "context"
+import (
+	"context"
+)
 
 type User struct {
 	ID             string `db:"id"`
@@ -13,7 +15,7 @@ type User struct {
 func (d *db) AddUser(ctx context.Context, u *User) error {
 	const q = "insert into users(name, email, email_confirmed, password_hash) values(:name, :email, :email_confirmed, :password_hash)"
 
-	_, err := d.db.ExecContext(ctx, q, u)
+	_, err := d.db.NamedExecContext(ctx, q, u)
 
 	return err
 }
@@ -32,7 +34,6 @@ func (d *db) GetUserByEmail(ctx context.Context, email string) (*User, error) {
 
 	u := &User{}
 	err := d.db.GetContext(ctx, u, q, email)
-
 	return u, err
 }
 
@@ -66,7 +67,7 @@ func (d *db) IsUserWithEmailPasswordExists(ctx context.Context, email string, pa
 func (d *db) UpdateUser(ctx context.Context, u *User) error {
 	const q = "update users set email=coalesce(:email,email), email_confirmed=coalesce(:email_confirmed,email_confirmed), password_hash=coalesce(:password_hash,password_hash), name=coalesce(:name, name) where id=:id"
 
-	_, err := d.db.ExecContext(ctx, q, u)
+	_, err := d.db.NamedExecContext(ctx, q, u)
 
 	return err
 }
