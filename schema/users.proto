@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package kanban_tt.schema;
+
+option go_package = "./;schema";
+
+service Users {
+  // AddUser - add user after registration.
+  rpc AddUser(AddUserRequest) returns (AddUserResponse) {}
+  // GetUser - get user by id.
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
+  // GetUserByEmail - get user by email
+  rpc GetUserByEmail(GetUserByEmailRequest) returns (GetUserByEmailResponse) {}
+  // IsValidUserCredentials - check if user with given credentials exists.
+  rpc IsValidUserCredentials(IsValidUserCredentialsRequest) returns (IsValidUserCredentialsResponse) {}
+  // GetUsers -  get users by id.
+  rpc GetUsers(GetUsersRequest) returns (GetUsersResponse) {}
+  // UpdateUser - update user by id.
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {}
+}
+
+message AddUserRequest {
+  string name = 1;
+  string user_name = 2;
+  string email = 3;
+  string password_hash = 4;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message GetUserByEmailRequest {
+  string email = 1;
+}
+
+message IsValidUserCredentialsRequest {
+  string email = 1;
+  string password_hash = 2;
+}
+
+message GetUsersRequest {
+  repeated string ids = 1;
+}
+
+message AddUserResponse {
+  string id = 1;
+}
+
+message GetUserByEmailResponse {
+  User user = 1;
+}
+
+message GetUserResponse {
+  User user = 1;
+}
+
+message IsValidUserCredentialsResponse {
+  bool is_valid = 1;
+}
+
+message GetUsersResponse {
+  repeated User users = 1;
+}
+
+message UpdateUserRequest {
+  string name = 1;
+  string user_name = 2;
+  string email = 3;
+  string password_hash = 4;
+}
+
+message UpdateUserResponse {}
+
+message User {
+  string id = 1;
+  string name = 2;
+  string user_name = 3;
+  string email = 4;
+  bool email_confirmed = 5;
+}
+
