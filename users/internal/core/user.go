@@ -35,6 +35,24 @@ func (s *ServiceImpl) GetUser(ctx context.Context, id string) (*User, bool, erro
 	return convertDBUserToService(user), true, nil
 }
 
+func (s *ServiceImpl) GetUserByEmail(ctx context.Context, email string) (*User, bool, error) {
+	exists, err := s.db.IsUserWithEmailExists(ctx, email)
+	if err != nil {
+		return nil, false, err
+	}
+
+	if !exists {
+		return nil, true, errors.New("user with such email does not exist")
+	}
+
+	user, err := s.db.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, false, err
+	}
+
+	return convertDBUserToService(user), true, nil
+}
+
 func (s *ServiceImpl) IsUserWithEmailExists(ctx context.Context, email string) (bool, error) {
 	return s.db.IsUserWithEmailExists(ctx, email)
 }

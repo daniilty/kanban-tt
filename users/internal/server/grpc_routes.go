@@ -32,6 +32,21 @@ func (g *GRPC) GetUser(ctx context.Context, req *schema.GetUserRequest) (*schema
 	}, nil
 }
 
+func (g *GRPC) GetUserByEmail(ctx context.Context, req *schema.GetUserByEmailRequest) (*schema.GetUserByEmailResponse, error) {
+	user, ok, err := g.service.GetUserByEmail(ctx, req.GetEmail())
+	if err != nil {
+		if ok {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &schema.GetUserByEmailResponse{
+		User: convertCoreUserToPB(user),
+	}, nil
+}
+
 func (g *GRPC) IsUserWithEmailExists(ctx context.Context, req *schema.IsUserWithEmailExistsRequest) (*schema.IsUserWithEmailExistsResponse, error) {
 	exists, err := g.service.IsUserWithEmailExists(ctx, req.GetEmail())
 	if err != nil {

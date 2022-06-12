@@ -10,6 +10,7 @@ import (
 type DB interface {
 	AddUser(context.Context, *User) error
 	GetUser(context.Context, string) (*User, error)
+	GetUserByEmail(context.Context, string) (*User, error)
 	IsUserWithIDExists(context.Context, string) (bool, error)
 	IsUserWithEmailExists(context.Context, string) (bool, error)
 	IsUserWithEmailPasswordExists(context.Context, string, string) (bool, error)

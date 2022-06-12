@@ -27,6 +27,15 @@ func (d *db) GetUser(ctx context.Context, id string) (*User, error) {
 	return u, err
 }
 
+func (d *db) GetUserByEmail(ctx context.Context, email string) (*User, error) {
+	const q = "select * from users where email=$1"
+
+	u := &User{}
+	err := d.db.GetContext(ctx, u, q, email)
+
+	return u, err
+}
+
 func (d *db) IsUserWithIDExists(ctx context.Context, id string) (bool, error) {
 	const q = "select exists(select from users where id=$1)"
 
