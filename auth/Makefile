@@ -1,0 +1,4 @@
+build:
+	go build github.com/daniilty/kanban-tt/auth/cmd/server
+build_docker:
+	docker build -t kanban-tt-auth:latest -f docker/Dockerfile .
