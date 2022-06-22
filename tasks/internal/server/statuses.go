@@ -10,6 +10,7 @@ import (
 )
 
 type status struct {
+	ID       int    `json:"id"`
 	Name     string `json:"name"`
 	Priority uint32 `json:"priority"`
 }
@@ -87,6 +88,46 @@ func (h *HTTP) addStatusResponse(r *http.Request) response {
 		}
 
 		h.logger.Errorw("add task", "err", err)
+
+		return getInternalServerErrorResponse()
+	}
+
+	return newOKResponse(struct{}{})
+}
+
+func (h *HTTP) handleUpdateStatus(w http.ResponseWriter, r *http.Request) {
+	resp := h.updateStatusResponse(r)
+
+	resp.writeJSON(w)
+}
+
+func (h *HTTP) updateStatusResponse(r *http.Request) response {
+	if r.Body == http.NoBody {
+		return getBadRequestWithMsgResponse("no payload")
+	}
+
+	status := &status{}
+
+	err := unmarshalReader(r.Body, status)
+	if err != nil {
+		return getBadRequestWithMsgResponse(fmt.Sprintf("bad body: %s", err.Error()))
+	}
+
+	if status.ID < 0 {
+		return getBadRequestWithMsgResponse("id must be positive integer")
+	}
+
+	err, ok := h.service.UpdateStatus(r.Context(), &core.Status{
+		ID:       status.ID,
+		Name:     status.Name,
+		Priority: status.Priority,
+	})
+	if err != nil {
+		if ok {
+			return getBadRequestWithMsgResponse(err.Error())
+		}
+
+		h.logger.Errorw("update task", "err", err)
 
 		return getInternalServerErrorResponse()
 	}

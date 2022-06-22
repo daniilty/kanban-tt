@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"errors"
 
 	"github.com/daniilty/kanban-tt/tasks/internal/pg"
 )
@@ -43,8 +44,13 @@ func (s *service) GetStatuses(ctx context.Context, uid string) ([]*Status, error
 	return dbStatusesToView(statuses), nil
 }
 
-func (s *service) UpdateStatus(ctx context.Context, status *Status) error {
-	return s.db.UpdateStatus(ctx, status.toDB())
+func (s *service) UpdateStatus(ctx context.Context, status *Status) (error, bool) {
+	err := s.db.UpdateStatus(ctx, status.toDB())
+	if err != nil {
+		return err, errors.Is(err, pg.ErrEmptyModel)
+	}
+
+	return nil, true
 }
 
 func (s *service) DeleteStatus(ctx context.Context, id string) error {

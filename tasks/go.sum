@@ -2,6 +2,8 @@ github.com/benbjohnson/clock v1.1.0 h1:Q92kusRqC1XV2MjkWETPvjJVqKetz1OzxZB7mHJLj
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/daniilty/kanban-tt/auth v0.0.0-20220612145814-b859c85dbc7e h1:bl+uZA7xthy/y46gK84Q7FFIDJJwDbWVugc8I/j2n9Y=
 github.com/daniilty/kanban-tt/auth v0.0.0-20220612145814-b859c85dbc7e/go.mod h1:9OLbO88dDsvzOa2RHE8cGBiZ+xDrLKG2jG1NAhx3RBs=
+github.com/daniilty/pgxquery v0.0.0-20220621145142-9773ae291868 h1:AjXc/PSdrBoYiQZQ0mLD4Ay9pOgZXDCMVki8VN9jVDk=
+github.com/daniilty/pgxquery v0.0.0-20220621145142-9773ae291868/go.mod h1:FL1L9ca7nlvcoEajyy5N+hDHdO61UIDZTXfcE1I0IL4=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

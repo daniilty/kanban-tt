@@ -2,16 +2,21 @@ package pg
 
 import (
 	"context"
+	"errors"
 	"time"
+
+	"github.com/daniilty/pgxquery"
 )
 
 type Task struct {
-	ID        int        `db:"id"`
-	Content   string     `db:"content"`
-	Priority  int        `db:"priority"`
-	OwnerID   string     `db:"owner_id"`
-	StatusID  int        `db:"status_id"`
-	CreatedAt *time.Time `db:"created_at"`
+	pgxquery.TableName `db:"tasks"`
+
+	ID        int        `db:"id,primarykey"`
+	Content   string     `db:"content,omitempty"`
+	Priority  int        `db:"priority,omitempty"`
+	OwnerID   string     `db:"owner_id,omitempty"`
+	StatusID  int        `db:"status_id,omitempty"`
+	CreatedAt *time.Time `db:"created_at,omitempty"`
 }
 
 func (d *db) AddTask(ctx context.Context, t *Task) error {
@@ -32,9 +37,16 @@ func (d *db) GetTasks(ctx context.Context, uid string) ([]*Task, error) {
 }
 
 func (d *db) UpdateTask(ctx context.Context, t *Task) error {
-	const q = "update tasks set content=coalesce(:content, content), priority=coalesce(:priority, priority), status_id=coalesce(:status_id, status_id) where id=:id"
+	q, err := pgxquery.GenerateNamedUpdate(t)
+	if err != nil {
+		if errors.Is(err, pgxquery.ErrEmptyModel) {
+			return ErrEmptyModel
+		}
 
-	_, err := d.db.NamedExecContext(ctx, q, t)
+		return err
+	}
+
+	_, err = d.db.NamedExecContext(ctx, q, t)
 
 	return err
 }

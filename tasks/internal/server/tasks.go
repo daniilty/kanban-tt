@@ -9,6 +9,7 @@ import (
 )
 
 type task struct {
+	ID       int    `json:"id,omitempty"`
 	Content  string `json:"content"`
 	Priority uint32 `json:"priority"`
 	StatusID uint32 `json:"status_id"`
@@ -90,6 +91,47 @@ func (h *HTTP) addTaskResponse(r *http.Request) response {
 		}
 
 		h.logger.Errorw("add task", "err", err)
+
+		return getInternalServerErrorResponse()
+	}
+
+	return newOKResponse(struct{}{})
+}
+
+func (h *HTTP) handleUpdateTask(w http.ResponseWriter, r *http.Request) {
+	resp := h.updateTaskResponse(r)
+
+	resp.writeJSON(w)
+}
+
+func (h *HTTP) updateTaskResponse(r *http.Request) response {
+	if r.Body == http.NoBody {
+		return getBadRequestWithMsgResponse("no payload")
+	}
+
+	task := &task{}
+
+	err := unmarshalReader(r.Body, task)
+	if err != nil {
+		return getBadRequestWithMsgResponse(fmt.Sprintf("bad body: %s", err.Error()))
+	}
+
+	if task.ID < 0 {
+		return getBadRequestWithMsgResponse("id must be positive integer")
+	}
+
+	err, ok := h.service.UpdateTask(r.Context(), &core.Task{
+		ID:       task.ID,
+		Content:  task.Content,
+		Priority: task.Priority,
+		StatusID: task.StatusID,
+	})
+	if err != nil {
+		if ok {
+			return getBadRequestWithMsgResponse(err.Error())
+		}
+
+		h.logger.Errorw("update task", "err", err)
 
 		return getInternalServerErrorResponse()
 	}

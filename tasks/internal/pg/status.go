@@ -4,13 +4,17 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+
+	"github.com/daniilty/pgxquery"
 )
 
 type Status struct {
-	ID       int    `db:"id"`
-	Name     string `db:"name"`
-	Priority int    `db:"priority"`
-	OwnerID  string `db:"owner_id"`
+	pgxquery.TableName `db:"statuses"`
+
+	ID       int    `db:"id,primarykey"`
+	Name     string `db:"name,omitempty"`
+	Priority int    `db:"priority,omitempty"`
+	OwnerID  string `db:"owner_id,omitempty"`
 }
 
 func (d *db) GetStatusWithLowestPriority(ctx context.Context, uid string) (*Status, error) {
@@ -64,9 +68,16 @@ func (d *db) GetStatuses(ctx context.Context, uid string) ([]*Status, error) {
 }
 
 func (d *db) UpdateStatus(ctx context.Context, s *Status) error {
-	const q = "update statuses set name=coalesce(:name, name), priority=coalesce(:priority, priority) where id=:id"
+	q, err := pgxquery.GenerateNamedUpdate(s)
+	if err != nil {
+		if errors.Is(err, pgxquery.ErrEmptyModel) {
+			return ErrEmptyModel
+		}
 
-	_, err := d.db.NamedExecContext(ctx, q, s)
+		return err
+	}
+
+	_, err = d.db.NamedExecContext(ctx, q, s)
 
 	return err
 }

@@ -9,12 +9,12 @@ import (
 type Service interface {
 	AddTask(context.Context, *Task) (error, bool)
 	GetTasks(context.Context, string) ([]*Task, error)
-	UpdateTask(context.Context, *Task) error
+	UpdateTask(context.Context, *Task) (error, bool)
 	DeleteTask(context.Context, string) error
 
 	AddStatus(context.Context, *Status) error
 	GetStatuses(context.Context, string) ([]*Status, error)
-	UpdateStatus(context.Context, *Status) error
+	UpdateStatus(context.Context, *Status) (error, bool)
 	DeleteStatus(context.Context, string) error
 }
 

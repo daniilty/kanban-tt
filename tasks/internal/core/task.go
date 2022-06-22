@@ -18,14 +18,12 @@ type Task struct {
 }
 
 func (t *Task) toDB() *pg.Task {
-	now := time.Now()
-
 	return &pg.Task{
-		Content:   t.Content,
-		Priority:  int(t.Priority),
-		OwnerID:   t.OwnerID,
-		StatusID:  int(t.StatusID),
-		CreatedAt: &now,
+		ID:       t.ID,
+		Content:  t.Content,
+		Priority: int(t.Priority),
+		OwnerID:  t.OwnerID,
+		StatusID: int(t.StatusID),
 	}
 }
 
@@ -41,6 +39,10 @@ func (s *service) AddTask(ctx context.Context, t *Task) (error, bool) {
 		return err, errors.Is(err, pg.ErrNoStatuses)
 	}
 	t.StatusID = uint32(status.ID)
+
+	tDB := t.toDB()
+	now := time.Now()
+	tDB.CreatedAt = &now
 
 	err = s.db.AddTask(ctx, t.toDB())
 	if err != nil {
@@ -59,8 +61,26 @@ func (s *service) GetTasks(ctx context.Context, uid string) ([]*Task, error) {
 	return dbTasksToView(tasks), nil
 }
 
-func (s *service) UpdateTask(ctx context.Context, t *Task) error {
-	return s.db.UpdateTask(ctx, t.toDB())
+func (s *service) UpdateTask(ctx context.Context, t *Task) (error, bool) {
+	exists, err := s.db.IsStatusWithIDExists(ctx, int(t.StatusID))
+	if err != nil {
+		return err, false
+	}
+
+	if !exists {
+		return fmt.Errorf("status with such id does not exist: %d", t.StatusID), true
+	}
+
+	err = s.db.UpdateTask(ctx, t.toDB())
+	if err != nil {
+		if errors.Is(err, pg.ErrEmptyModel) {
+			return err, true
+		}
+
+		return err, false
+	}
+
+	return nil, true
 }
 
 func (s *service) DeleteTask(ctx context.Context, id string) error {
