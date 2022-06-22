@@ -5,4 +5,4 @@ create table users(
   password_hash varchar not null,
   email_confirmed boolean not null,
   created_at date not null
-)
+);

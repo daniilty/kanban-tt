@@ -15,7 +15,7 @@ services:
       - api
   auth-api:
     image: kanban-tt/auth-api:latest
-    #restart: unless-stopped
+    restart: unless-stopped
     networks:
       - api
     depends_on:
@@ -26,8 +26,6 @@ services:
       TOKEN_EXPIRY: 86400
       PUBKEY: ${PUBKEY}
       PRIVKEY: ${PRIVKEY}
-    ports:
-      - "3000:3000"
   users-api:
     image: kanban-tt/users-api:latest
     restart: unless-stopped
