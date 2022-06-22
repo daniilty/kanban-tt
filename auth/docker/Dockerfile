@@ -1,4 +1,4 @@
-FROM golang:1.17.2-buster as builder
+FROM golang:1.18-buster as builder
 
 WORKDIR /app
 
@@ -7,6 +7,7 @@ RUN go mod download
 
 COPY cmd cmd
 COPY internal internal
+COPY claims claims
 
 COPY Makefile .
 

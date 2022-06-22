@@ -34,7 +34,7 @@ type ManagerImpl struct {
 func NewManagerImpl(pubKeyBytes []byte, privKeyBytes []byte, exp int64) (*ManagerImpl, error) {
 	const (
 		alg = jwa.RS256
-		kid = "sharenotes_kid"
+		kid = "kanban_kid"
 	)
 
 	privateRSAKey, publicRSAKey, err := parseRSAKeyPair(privKeyBytes, pubKeyBytes)

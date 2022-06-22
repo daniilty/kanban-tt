@@ -1,0 +1,68 @@
+version: "3"
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      PGDATA: /data/postgres
+      restart: unless-stopped
+    volumes:
+       - ./postgres:/data/postgres
+    networks:
+      - api
+  auth-api:
+    image: kanban-tt/auth-api:latest
+    #restart: unless-stopped
+    networks:
+      - api
+    depends_on:
+      - postgres
+    environment:
+      USERS_GRPC_ADDR: users-api:8000
+      HTTP_SERVER_ADDR: :3000
+      TOKEN_EXPIRY: 86400
+      PUBKEY: ${PUBKEY}
+      PRIVKEY: ${PRIVKEY}
+    ports:
+      - "3000:3000"
+  users-api:
+    image: kanban-tt/users-api:latest
+    restart: unless-stopped
+    networks:
+      - api
+    depends_on:
+      - postgres
+    environment:
+      GRPC_SERVER_ADDR: :8000
+      PG_CONN: postgres://${PG_USER}:${PG_PASSWORD}@postgres:5432/postgres?sslmode=disable
+  tasks-api:
+    image: kanban-tt/tasks-api:latest
+    restart: unless-stopped
+    networks:
+      - api
+    depends_on:
+      - postgres
+    environment:
+      HTTP_ADDR: :3000
+      PG_CONN: postgres://${PG_USER}:${PG_PASSWORD}@postgres:5432/postgres?sslmode=disable
+  krakend_ce:
+    image: devopsfaith/krakend:1.4.1
+    volumes:
+      - ./krakend:/etc/krakend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    command: ["run", "-d", "-c", "/etc/krakend/krakend.json"]
+    depends_on:
+      - auth-api
+      - users-api
+      - tasks-api
+    networks:
+      - api
+
+networks:
+  api:
+    driver: bridge

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 )
 
@@ -27,8 +26,6 @@ func loadEnvConfig() (*envConfig, error) {
 	if !ok {
 		return nil, fmt.Errorf(provideEnvErrorMsg, pgConnStringEnv)
 	}
-
-	log.Println(cfg.pgConnString)
 
 	cfg.grpcAddr, ok = os.LookupEnv(grpcAddrEnv)
 	if !ok {

@@ -16,6 +16,7 @@ func writeJSONResponse(w http.ResponseWriter, status int, v interface{}) error {
 		return fmt.Errorf("marshal json: %w", err)
 	}
 
+	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(status)
 
 	_, err = w.Write(bb)
