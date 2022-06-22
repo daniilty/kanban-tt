@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"errors"
+	"time"
 )
 
 type User struct {
@@ -14,7 +15,11 @@ type User struct {
 }
 
 func (s *ServiceImpl) AddUser(ctx context.Context, user *User) error {
-	return s.db.AddUser(ctx, user.toDB())
+	u := user.toDB()
+	now := time.Now()
+	u.CreatedAt = &now
+
+	return s.db.AddUser(ctx, u)
 }
 
 func (s *ServiceImpl) GetUser(ctx context.Context, id string) (*User, bool, error) {

@@ -2,18 +2,20 @@ package pg
 
 import (
 	"context"
+	"time"
 )
 
 type User struct {
-	ID             string `db:"id"`
-	Name           string `db:"name"`
-	Email          string `db:"email"`
-	PasswordHash   string `db:"password_hash"`
-	EmailConfirmed bool   `db:"email_confirmed"`
+	ID             string     `db:"id"`
+	Name           string     `db:"name"`
+	Email          string     `db:"email"`
+	PasswordHash   string     `db:"password_hash"`
+	EmailConfirmed bool       `db:"email_confirmed"`
+	CreatedAt      *time.Time `db:"created_at"`
 }
 
 func (d *db) AddUser(ctx context.Context, u *User) error {
-	const q = "insert into users(name, email, email_confirmed, password_hash) values(:name, :email, :email_confirmed, :password_hash)"
+	const q = "insert into users(name, email, email_confirmed, password_hash, created_at) values(:name, :email, :email_confirmed, :password_hash, :created_at)"
 
 	_, err := d.db.NamedExecContext(ctx, q, u)
 
