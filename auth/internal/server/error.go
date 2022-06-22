@@ -4,6 +4,7 @@ import (
 	"net/http"
 )
 
+// swagger:model
 type errorResponse struct {
 	Status    int    `json:"status"`
 	ErrorInfo string `json:"errorInfo"`

@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// swagger:model
 type accessTokenResponse struct {
 	AccessToken string `json:"accessToken"`
 }

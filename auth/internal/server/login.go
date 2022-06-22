@@ -5,8 +5,11 @@ import (
 	"net/http"
 )
 
+// swagger:model
 type loginRequest struct {
-	Email    string `json:"email"`
+	// required: true
+	Email string `json:"email"`
+	// required: true
 	Password string `json:"password"`
 }
 
@@ -22,6 +25,20 @@ func (l *loginRequest) validate() error {
 	return nil
 }
 
+// swagger:route POST /api/v1/auth/login Authorize user
+// Login to your account
+//
+// parameters:
+//  + name: loginRequest
+//    in: body
+//    required: true
+//    type: loginRequest
+//
+// Returns operation result
+// responses:
+//    200: accessTokenResponse
+//    400: errorResponse Bad request
+//    500: errorResponse Internal server error
 func (h *HTTP) login(w http.ResponseWriter, r *http.Request) {
 	resp := h.getLoginResponse(r)
 

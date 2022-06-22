@@ -7,9 +7,13 @@ import (
 	"github.com/daniilty/kanban-tt/auth/internal/validate"
 )
 
+// swagger:model
 type registerRequest struct {
-	Email    string `json:"email"`
-	Name     string `json:"name"`
+	// required: true
+	Email string `json:"email"`
+	// required: true
+	Name string `json:"name"`
+	// required: true
 	Password string `json:"password"`
 }
 
@@ -36,6 +40,20 @@ func (r *registerRequest) validate() error {
 	return err
 }
 
+// swagger:route POST /api/v1/auth/register Register user
+// Register user
+//
+// parameters:
+//  + name: registerRequest
+//    in: body
+//    required: true
+//    type: registerRequest
+//
+// Returns operation result
+// responses:
+//    200: accessTokenResponse
+//    400: errorResponse Bad request
+//    500: errorResponse Internal server error
 func (h *HTTP) register(w http.ResponseWriter, r *http.Request) {
 	resp := h.getRegisterResponse(r)
 

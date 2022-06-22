@@ -2,6 +2,7 @@ package server
 
 import "net/http"
 
+// swagger:model
 type userInfoResponse struct {
 	ID             string `json:"id"`
 	Email          string `json:"email"`
@@ -13,6 +14,17 @@ func (u *userInfoResponse) writeJSON(w http.ResponseWriter) error {
 	return writeJSONResponse(w, http.StatusOK, u)
 }
 
+// swagger:route GET /api/v1/auth/me UserInfo user
+// get account info
+//
+// security:
+//    api-key: Bearer
+// Returns operation result
+// responses:
+//    200: userInfoResponse
+//    400: errorResponse Bad request
+//    401: errorResponse Unauthorized
+//    500: errorResponse Internal server error
 func (h *HTTP) me(w http.ResponseWriter, r *http.Request) {
 	resp := h.getMeResponse(r)
 
