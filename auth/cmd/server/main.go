@@ -10,6 +10,7 @@ import (
 
 	"github.com/daniilty/kanban-tt/auth/internal/core"
 	"github.com/daniilty/kanban-tt/auth/internal/jwt"
+	"github.com/daniilty/kanban-tt/auth/internal/kafka"
 	"github.com/daniilty/kanban-tt/auth/internal/server"
 	"github.com/daniilty/kanban-tt/schema"
 	"go.uber.org/zap"
@@ -41,7 +42,8 @@ func run() error {
 	}
 
 	client := schema.NewUsersClient(conn)
-	service := core.NewServiceImpl(client, manager)
+	kafkaProducer := kafka.NewProducer(cfg.kafkaTopic, []string{cfg.kafkaBroker}, cfg.kafkaGroupID)
+	service := core.NewServiceImpl(client, manager, kafkaProducer)
 
 	loggerCfg := zap.NewProductionConfig()
 

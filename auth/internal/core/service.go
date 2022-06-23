@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/daniilty/kanban-tt/auth/internal/jwt"
+	"github.com/daniilty/kanban-tt/auth/internal/kafka"
 	schema "github.com/daniilty/kanban-tt/schema"
 )
 
@@ -18,13 +19,15 @@ type Service interface {
 }
 
 type ServiceImpl struct {
-	usersClient schema.UsersClient
-	jwtManager  jwt.Manager
+	usersClient   schema.UsersClient
+	jwtManager    jwt.Manager
+	kafkaProducer kafka.Producer
 }
 
-func NewServiceImpl(usersClient schema.UsersClient, jwtManager jwt.Manager) *ServiceImpl {
+func NewServiceImpl(usersClient schema.UsersClient, jwtManager jwt.Manager, kafkaProducer kafka.Producer) *ServiceImpl {
 	return &ServiceImpl{
-		usersClient: usersClient,
-		jwtManager:  jwtManager,
+		usersClient:   usersClient,
+		jwtManager:    jwtManager,
+		kafkaProducer: kafkaProducer,
 	}
 }

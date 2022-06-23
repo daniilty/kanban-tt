@@ -35,5 +35,13 @@ func (s *ServiceImpl) Register(ctx context.Context, user *UserInfo) (string, boo
 		return "", false, err
 	}
 
+	err = s.kafkaProducer.SendMessage(ctx, &schema.Email{
+		To:  user.Email,
+		Msg: "please confirm your email",
+	})
+	if err != nil {
+		return "", false, err
+	}
+
 	return accessToken, true, nil
 }

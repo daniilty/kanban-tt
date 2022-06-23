@@ -7,52 +7,19 @@ import (
 )
 
 type envConfig struct {
-	httpAddr      string
-	usersGRPCAddr string
-	pubKey        string
-	privKey       string
-	tokenExpiry   int
 	kafkaBroker   string
 	kafkaTopic    string
 	kafkaGroupID  string
+	smtpHost      string
+	smtpUser      string
+	smtpPassword  string
+	eventsTimeout int
 }
 
 func loadEnvConfig() (*envConfig, error) {
 	var err error
 
 	cfg := &envConfig{}
-
-	cfg.httpAddr, err = lookupEnv("HTTP_SERVER_ADDR")
-	if err != nil {
-		return nil, err
-	}
-
-	cfg.usersGRPCAddr, err = lookupEnv("USERS_GRPC_ADDR")
-	if err != nil {
-		return nil, err
-	}
-
-	cfg.pubKey, err = lookupEnv("PUBKEY")
-	if err != nil {
-		return nil, err
-	}
-
-	cfg.privKey, err = lookupEnv("PRIVKEY")
-	if err != nil {
-		return nil, err
-	}
-
-	var expiryString string
-
-	expiryString, err = lookupEnv("TOKEN_EXPIRY")
-	if err != nil {
-		return nil, err
-	}
-
-	cfg.tokenExpiry, err = strconv.Atoi(expiryString)
-	if err != nil {
-		return nil, err
-	}
 
 	cfg.kafkaBroker, err = lookupEnv("KAFKA_BROKER")
 	if err != nil {
@@ -64,7 +31,32 @@ func loadEnvConfig() (*envConfig, error) {
 		return nil, err
 	}
 
+	cfg.smtpHost, err = lookupEnv("SMTP_HOST")
+	if err != nil {
+		return nil, err
+	}
+
+	cfg.smtpUser, err = lookupEnv("SMTP_USER")
+	if err != nil {
+		return nil, err
+	}
+
+	cfg.smtpPassword, err = lookupEnv("SMTP_PASSWORD")
+	if err != nil {
+		return nil, err
+	}
+
 	cfg.kafkaGroupID, err = lookupEnv("KAFKA_GROUP_ID")
+	if err != nil {
+		return nil, err
+	}
+
+	timeoutString, err := lookupEnv("TIMEOUT")
+	if err != nil {
+		return nil, err
+	}
+
+	cfg.eventsTimeout, err = strconv.Atoi(timeoutString)
 	if err != nil {
 		return nil, err
 	}

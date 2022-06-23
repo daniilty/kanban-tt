@@ -26,6 +26,24 @@ services:
       TOKEN_EXPIRY: 86400
       PUBKEY: ${PUBKEY}
       PRIVKEY: ${PRIVKEY}
+      KAFKA_BROKER: broker:9092
+      KAFKA_TOPIC: emails
+      KAFKA_GROUP_ID: auth-api
+  email:
+    image: kanban-tt/email:latest
+    restart: unless-stopped
+    networks:
+      - api
+    depends_on:
+      - broker
+    environment:
+      KAFKA_BROKER: broker:9092
+      KAFKA_TOPIC: emails
+      SMTP_HOST: mail.pesda.ru:587
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      KAFKA_GROUP_ID: email-sender
+      TIMEOUT: 10
   users-api:
     image: kanban-tt/users-api:latest
     restart: unless-stopped
@@ -60,6 +78,30 @@ services:
       - tasks-api
     networks:
       - api
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1
+    container_name: zookeeper
+    networks:
+      - api
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+  broker:
+    image: confluentinc/cp-kafka:7.0.1
+    container_name: broker
+    depends_on:
+      - zookeeper
+    networks:
+      - api
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      TOPIC_AUTO_CREATE: 1
 
 networks:
   api:
