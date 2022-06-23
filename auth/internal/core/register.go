@@ -13,10 +13,10 @@ import (
 func (s *ServiceImpl) Register(ctx context.Context, user *UserInfo) (string, bool, error) {
 	userResp, err := s.usersClient.GetUserByEmail(ctx, &schema.GetUserByEmailRequest{Email: user.Email})
 	if err == nil {
-		if status.Code(err) == codes.InvalidArgument {
-			return "", true, fmt.Errorf("user with such email already exists: %s", user.Email)
-		}
+		return "", true, fmt.Errorf("user with such email already exists: %s", user.Email)
+	}
 
+	if status.Code(err) != codes.InvalidArgument {
 		return "", false, err
 	}
 

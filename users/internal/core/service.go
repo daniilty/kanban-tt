@@ -9,7 +9,7 @@ import (
 var _ Service = (*ServiceImpl)(nil)
 
 type Service interface {
-	AddUser(context.Context, *User) error
+	AddUser(context.Context, *User) (int, error)
 	GetUser(context.Context, string) (*User, bool, error)
 	GetUserByEmail(context.Context, string) (*User, bool, error)
 	IsUserWithEmailExists(context.Context, string) (bool, error)

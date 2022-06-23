@@ -14,7 +14,7 @@ type User struct {
 	PasswordHash   string
 }
 
-func (s *ServiceImpl) AddUser(ctx context.Context, user *User) error {
+func (s *ServiceImpl) AddUser(ctx context.Context, user *User) (int, error) {
 	u := user.toDB()
 	now := time.Now()
 	u.CreatedAt = &now

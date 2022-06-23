@@ -14,12 +14,14 @@ type User struct {
 	CreatedAt      *time.Time `db:"created_at"`
 }
 
-func (d *db) AddUser(ctx context.Context, u *User) error {
-	const q = "insert into users(name, email, email_confirmed, password_hash, created_at) values(:name, :email, :email_confirmed, :password_hash, :created_at)"
+func (d *db) AddUser(ctx context.Context, u *User) (int, error) {
+	const q = "insert into users(name, email, email_confirmed, password_hash, created_at) values($1, $2, $3, $4, $5) returing id;"
 
-	_, err := d.db.NamedExecContext(ctx, q, u)
+	var id int
 
-	return err
+	err := d.db.QueryRowContext(ctx, q, u.Name, u.Email, u.EmailConfirmed, u.PasswordHash, u.CreatedAt).Scan(&id)
+
+	return id, err
 }
 
 func (d *db) GetUser(ctx context.Context, id string) (*User, error) {
