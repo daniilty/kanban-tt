@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package kanban_tt.schema;
+
+option go_package = "./;schema";
+
+message Email {
+  string to = 1;
+  string msg = 2;
+}
+
