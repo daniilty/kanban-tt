@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/daniilty/kanban-tt/auth/claims"
 	"github.com/daniilty/kanban-tt/schema"
@@ -11,7 +12,7 @@ import (
 )
 
 func (s *ServiceImpl) Register(ctx context.Context, user *UserInfo) (string, bool, error) {
-	userResp, err := s.usersClient.GetUserByEmail(ctx, &schema.GetUserByEmailRequest{Email: user.Email})
+	_, err := s.usersClient.GetUserByEmail(ctx, &schema.GetUserByEmailRequest{Email: user.Email})
 	if err == nil {
 		return "", true, fmt.Errorf("user with such email already exists: %s", user.Email)
 	}
@@ -20,13 +21,15 @@ func (s *ServiceImpl) Register(ctx context.Context, user *UserInfo) (string, boo
 		return "", false, err
 	}
 
-	_, err = s.usersClient.AddUser(ctx, convertUserInfoToAddUser(user))
+	resp, err := s.usersClient.AddUser(ctx, convertUserInfoToAddUser(user))
 	if err != nil {
 		return "", false, err
 	}
 
+	uid := strconv.Itoa(int(resp.GetId()))
+
 	accessToken, err := s.jwtManager.Generate(&claims.Subject{
-		UID: userResp.GetUser().GetId(),
+		UID: uid,
 	})
 	if err != nil {
 		return "", false, err

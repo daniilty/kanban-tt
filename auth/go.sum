@@ -15,6 +15,8 @@ github.com/cncf/xds/go v0.0.0-20211001041855-01bcc9b48dfe/go.mod h1:eXthEFrGJvWH
 github.com/cncf/xds/go v0.0.0-20211011173535-cb28da3451f1/go.mod h1:eXthEFrGJvWHgFFCl3hGmgk+/aYT6PnTQLykKQRLhEs=
 github.com/daniilty/kanban-tt/schema v0.0.0-20220612123837-ed1bfcb79321 h1:RjbrJckkX6BFjc7YucgU/lI/ZCqAlC72yMTC/ihcWjY=
 github.com/daniilty/kanban-tt/schema v0.0.0-20220612123837-ed1bfcb79321/go.mod h1:p2q3LRirtXmk7c7T5meM8LlXHzPNtvk9dkr43y0ub+s=
+github.com/daniilty/kanban-tt/schema v0.0.0-20220623193948-ab3e5d3b5a83 h1:sa0cS8dEAX9YBnvzP8cyQ4WAxtxUqbPGHm+Xdo6p4Zk=
+github.com/daniilty/kanban-tt/schema v0.0.0-20220623193948-ab3e5d3b5a83/go.mod h1:p2q3LRirtXmk7c7T5meM8LlXHzPNtvk9dkr43y0ub+s=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
