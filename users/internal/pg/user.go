@@ -15,7 +15,7 @@ type User struct {
 }
 
 func (d *db) AddUser(ctx context.Context, u *User) (int, error) {
-	const q = "insert into users(name, email, email_confirmed, password_hash, created_at) values($1, $2, $3, $4, $5) returing id;"
+	const q = "insert into users(name, email, email_confirmed, password_hash, created_at) values($1, $2, $3, $4, $5) returning id;"
 
 	var id int
 
