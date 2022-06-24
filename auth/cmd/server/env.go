@@ -7,14 +7,16 @@ import (
 )
 
 type envConfig struct {
-	httpAddr      string
-	usersGRPCAddr string
-	pubKey        string
-	privKey       string
-	tokenExpiry   int
-	kafkaBroker   string
-	kafkaTopic    string
-	kafkaGroupID  string
+	httpAddr        string
+	usersGRPCAddr   string
+	pubKey          string
+	privKey         string
+	tokenExpiry     int
+	kafkaBroker     string
+	kafkaTopic      string
+	kafkaGroupID    string
+	pgConnString    string
+	confirmEmailURL string
 }
 
 func loadEnvConfig() (*envConfig, error) {
@@ -38,6 +40,16 @@ func loadEnvConfig() (*envConfig, error) {
 	}
 
 	cfg.privKey, err = lookupEnv("PRIVKEY")
+	if err != nil {
+		return nil, err
+	}
+
+	cfg.pgConnString, err = lookupEnv("PG_CONN")
+	if err != nil {
+		return nil, err
+	}
+
+	cfg.confirmEmailURL, err = lookupEnv("CONFIRM_EMAIL_URL")
 	if err != nil {
 		return nil, err
 	}

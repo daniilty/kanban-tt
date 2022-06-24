@@ -1,6 +1,8 @@
 package server
 
 import (
+	"strconv"
+
 	"github.com/daniilty/kanban-tt/schema"
 	"github.com/daniilty/kanban-tt/users/internal/core"
 )
@@ -15,9 +17,11 @@ func convertPBAddUserToCore(user *schema.AddUserRequest) *core.User {
 
 func convertPBUpdateUserToCore(user *schema.UpdateUserRequest) *core.User {
 	return &core.User{
-		Name:         user.Name,
-		Email:        user.Email,
-		PasswordHash: user.PasswordHash,
+		ID:             strconv.Itoa(int(user.Id)),
+		Name:           user.Name,
+		Email:          user.Email,
+		PasswordHash:   user.PasswordHash,
+		EmailConfirmed: user.EmailConfirmed,
 	}
 }
 

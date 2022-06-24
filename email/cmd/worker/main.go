@@ -40,7 +40,7 @@ func run() error {
 	}
 
 	host := splittedHost[0]
-	port, err := strconv.Atoi(host)
+	port, err := strconv.Atoi(splittedHost[1])
 	if err != nil {
 		return err
 	}

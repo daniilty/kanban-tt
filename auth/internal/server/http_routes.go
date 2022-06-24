@@ -24,4 +24,8 @@ func (h *HTTP) setRoutes(r *mux.Router) {
 	api.HandleFunc("/me",
 		h.me,
 	).Methods(http.MethodGet)
+
+	api.HandleFunc("/confirm_email/{key}",
+		h.confirmEmail,
+	).Methods(http.MethodGet)
 }

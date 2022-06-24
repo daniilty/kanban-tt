@@ -30,7 +30,7 @@ func NewEventsListener(logger *zap.SugaredLogger, timeout time.Duration, consume
 }
 
 func (e *eventsListener) Listen(ctx context.Context) {
-	e.logger.Info("Listening for user events.")
+	e.logger.Info("Listening for email events.")
 	for {
 		select {
 		case <-ctx.Done():

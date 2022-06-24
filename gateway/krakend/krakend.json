@@ -76,6 +76,25 @@
 			}
 		},
 		{
+			"endpoint": "/api/v1/auth/confirm_email/{key}",
+			"method": "GET",
+			"output_encoding": "no-op",
+			"querystring_params": [
+				"*"
+			],
+			"headers_to_pass": [
+				"*"
+			],
+			"backend": [{
+				"url_pattern": "/api/v1/auth/confirm_email/{key}",
+				"host": [
+					"http://auth-api:3000"
+				],
+				"encoding": "no-op",
+				"disable_host_sanitize": true
+			}]
+		},
+		{
 			"endpoint": "/api/v1/auth/login",
 			"method": "POST",
 			"output_encoding": "no-op",

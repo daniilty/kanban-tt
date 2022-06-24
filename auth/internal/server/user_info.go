@@ -1,6 +1,12 @@
 package server
 
-import "net/http"
+import (
+	"errors"
+	"net/http"
+
+	"github.com/daniilty/kanban-tt/auth/internal/core"
+	"github.com/gorilla/mux"
+)
 
 // swagger:model
 type userInfoResponse struct {
@@ -49,4 +55,31 @@ func (h *HTTP) getMeResponse(r *http.Request) response {
 	}
 
 	return convertCoreUserInfoToResponse(userInfo)
+}
+
+func (h *HTTP) confirmEmail(w http.ResponseWriter, r *http.Request) {
+	resp := h.getConfirmEmailResponse(r)
+
+	resp.writeJSON(w)
+}
+
+func (h *HTTP) getConfirmEmailResponse(r *http.Request) response {
+	vars := mux.Vars(r)
+	key, ok := vars["key"]
+	if !ok {
+		return getBadRequestWithMsgResponse("missing key parameter")
+	}
+
+	err := h.service.ConfirmUserEmail(r.Context(), key)
+	if err != nil {
+		if errors.Is(err, core.ErrNoSuchKey) {
+			return getBadRequestWithMsgResponse(err.Error())
+		}
+
+		h.logger.Errorw("Confirm user email.", "err", err)
+
+		return getInternalServerErrorResponse()
+	}
+
+	return getOkResponse(struct{}{})
 }

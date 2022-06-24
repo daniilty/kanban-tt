@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"os"
 	"os/signal"
 	"sync"
@@ -11,6 +12,7 @@ import (
 	"github.com/daniilty/kanban-tt/auth/internal/core"
 	"github.com/daniilty/kanban-tt/auth/internal/jwt"
 	"github.com/daniilty/kanban-tt/auth/internal/kafka"
+	"github.com/daniilty/kanban-tt/auth/internal/pg"
 	"github.com/daniilty/kanban-tt/auth/internal/server"
 	"github.com/daniilty/kanban-tt/schema"
 	"go.uber.org/zap"
@@ -43,7 +45,19 @@ func run() error {
 
 	client := schema.NewUsersClient(conn)
 	kafkaProducer := kafka.NewProducer(cfg.kafkaTopic, []string{cfg.kafkaBroker}, cfg.kafkaGroupID)
-	service := core.NewServiceImpl(client, manager, kafkaProducer)
+	confirmURL, err := url.ParseRequestURI(cfg.confirmEmailURL)
+	if err != nil {
+		cancel()
+
+		return err
+	}
+	db, err := pg.Connect(ctx, cfg.pgConnString)
+	if err != nil {
+		cancel()
+
+		return err
+	}
+	service := core.NewServiceImpl(client, manager, kafkaProducer, confirmURL, db)
 
 	loggerCfg := zap.NewProductionConfig()
 

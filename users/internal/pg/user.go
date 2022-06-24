@@ -3,15 +3,19 @@ package pg
 import (
 	"context"
 	"time"
+
+	"github.com/daniilty/pgxquery"
 )
 
 type User struct {
-	ID             string     `db:"id"`
-	Name           string     `db:"name"`
-	Email          string     `db:"email"`
-	PasswordHash   string     `db:"password_hash"`
-	EmailConfirmed bool       `db:"email_confirmed"`
-	CreatedAt      *time.Time `db:"created_at"`
+	pgxquery.TableName `db:"users"`
+
+	ID             string     `db:"id,primarykey"`
+	Name           string     `db:"name,omitempty"`
+	Email          string     `db:"email,omitempty"`
+	PasswordHash   string     `db:"password_hash,omitempty"`
+	EmailConfirmed bool       `db:"email_confirmed,omitempty"`
+	CreatedAt      *time.Time `db:"created_at,omitempty"`
 }
 
 func (d *db) AddUser(ctx context.Context, u *User) (int, error) {
@@ -69,9 +73,12 @@ func (d *db) IsUserWithEmailPasswordExists(ctx context.Context, email string, pa
 }
 
 func (d *db) UpdateUser(ctx context.Context, u *User) error {
-	const q = "update users set email=coalesce(:email,email), email_confirmed=coalesce(:email_confirmed,email_confirmed), password_hash=coalesce(:password_hash,password_hash), name=coalesce(:name, name) where id=:id"
+	q, err := pgxquery.GenerateNamedUpdate(u)
+	if err != nil {
+		return err
+	}
 
-	_, err := d.db.NamedExecContext(ctx, q, u)
+	_, err = d.db.NamedExecContext(ctx, q, u)
 
 	return err
 }

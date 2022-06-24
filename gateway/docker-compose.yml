@@ -29,6 +29,8 @@ services:
       KAFKA_BROKER: broker:9092
       KAFKA_TOPIC: emails
       KAFKA_GROUP_ID: auth-api
+      PG_CONN: postgres://${PG_USER}:${PG_PASSWORD}@postgres:5432/postgres?sslmode=disable
+      CONFIRM_EMAIL_URL: http://localhost:8080/api/v1/auth/confirm_email
   email:
     image: kanban-tt/email:latest
     restart: unless-stopped

@@ -2,8 +2,10 @@ package core
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"github.com/daniilty/kanban-tt/auth/internal/pg"
 	"github.com/daniilty/kanban-tt/schema"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -38,4 +40,25 @@ func (s *ServiceImpl) GetUserInfo(ctx context.Context, accessToken string) (*Use
 	user := resp.GetUser()
 
 	return convertPBUserToUserInfo(user), true, nil
+}
+
+func (s *ServiceImpl) ConfirmUserEmail(ctx context.Context, key string) error {
+	t, err := s.db.GetToken(ctx, key)
+	if err != nil {
+		if errors.Is(err, pg.ErrNoSuchToken) {
+			return ErrNoSuchKey
+		}
+
+		return err
+	}
+
+	_, err = s.usersClient.UpdateUser(ctx, &schema.UpdateUserRequest{
+		Id:             int64(t.UID),
+		EmailConfirmed: true,
+	})
+	if err != nil {
+		return err
+	}
+
+	return s.db.DeleteToken(ctx, t.Key)
 }
