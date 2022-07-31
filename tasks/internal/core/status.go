@@ -16,6 +16,7 @@ type Status struct {
 
 func (s *Status) toDB() *pg.Status {
 	return &pg.Status{
+		ID:       s.ID,
 		Name:     s.Name,
 		Priority: int(s.Priority),
 		OwnerID:  s.OwnerID,
