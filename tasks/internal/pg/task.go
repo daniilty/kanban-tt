@@ -51,7 +51,7 @@ func (d *db) UpdateTask(ctx context.Context, t *Task) error {
 	return err
 }
 
-func (d *db) DeleteTask(ctx context.Context, id string) error {
+func (d *db) DeleteTask(ctx context.Context, id int) error {
 	const q = "delete from tasks where id=$1"
 
 	_, err := d.db.ExecContext(ctx, q, id)

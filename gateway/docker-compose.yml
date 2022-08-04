@@ -20,6 +20,7 @@ services:
       - api
     depends_on:
       - postgres
+      - broker
     environment:
       USERS_GRPC_ADDR: users-api:8000
       HTTP_SERVER_ADDR: :3000

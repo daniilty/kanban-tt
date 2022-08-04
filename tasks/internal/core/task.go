@@ -100,7 +100,7 @@ func (s *service) UpdateTask(ctx context.Context, t *Task) (error, Code) {
 	return nil, CodeOK
 }
 
-func (s *service) DeleteTask(ctx context.Context, id string) error {
+func (s *service) DeleteTask(ctx context.Context, id int) error {
 	return s.db.DeleteTask(ctx, id)
 }
 

@@ -130,6 +130,50 @@
         }
       }
     },
+    "/api/v1/tasks/status/{id}": {
+      "delete": {
+        "security": [
+          {
+            "api-key": [
+              "[]"
+            ]
+          }
+        ],
+        "description": "Delete status",
+        "tags": [
+          "Status"
+        ],
+        "operationId": "statusesDelete",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "okResponse",
+            "schema": {
+              "$ref": "#/definitions/okResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
     "/api/v1/tasks/statuses": {
       "get": {
         "security": [
@@ -259,6 +303,50 @@
             "description": "Bad request",
             "schema": {
               "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tasks/task/{id}": {
+      "delete": {
+        "security": [
+          {
+            "api-key": [
+              "[]"
+            ]
+          }
+        ],
+        "description": "Delete task",
+        "tags": [
+          "Task"
+        ],
+        "operationId": "taskDelete",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "okResponse",
+            "schema": {
+              "$ref": "#/definitions/okResponse"
             }
           },
           "401": {

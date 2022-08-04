@@ -4,9 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/daniilty/kanban-tt/auth/claims"
 	"github.com/daniilty/kanban-tt/tasks/internal/core"
+	"github.com/gorilla/mux"
 )
 
 const (
@@ -188,6 +190,51 @@ func (h *HTTP) updateStatusResponse(r *http.Request) response {
 		h.logger.Errorw("update task", "err", err)
 
 		return getInternalServerErrorResponse(code)
+	}
+
+	return newOKResponse(struct{}{})
+}
+
+// swagger:route Delete /api/v1/tasks/status/{id} Status statusesDelete
+// Delete status
+//
+// security:
+//    api-key: []
+//
+// parameters:
+//  + name: id
+//    in: path
+//    required: true
+//    type: integer
+//
+// Returns operation result
+// responses:
+//    200: okResponse
+//    401: errorResponse Unauthorized
+//    500: errorResponse Internal server error
+func (h *HTTP) handleDeleteStatus(w http.ResponseWriter, r *http.Request) {
+	resp := h.deleteStatusResponse(r)
+
+	resp.writeJSON(w)
+}
+
+func (h *HTTP) deleteStatusResponse(r *http.Request) response {
+	vars := mux.Vars(r)
+	idStr, ok := vars["id"]
+	if !ok {
+		return getBadRequestWithMsgResponse("no id", codeNoID)
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		msg := fmt.Sprintf("invalid id: %s", err)
+
+		return getBadRequestWithMsgResponse(msg, codeInvalidIDType)
+	}
+
+	err = h.service.DeleteStatus(r.Context(), id)
+	if err != nil {
+		return getInternalServerErrorResponse(core.CodeDBFail)
 	}
 
 	return newOKResponse(struct{}{})

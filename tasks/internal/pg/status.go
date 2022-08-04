@@ -82,7 +82,7 @@ func (d *db) UpdateStatus(ctx context.Context, s *Status) error {
 	return err
 }
 
-func (d *db) DeleteStatus(ctx context.Context, id string) error {
+func (d *db) DeleteStatus(ctx context.Context, id int) error {
 	const q = "delete from statuses where id=$1"
 
 	_, err := d.db.ExecContext(ctx, q, id)

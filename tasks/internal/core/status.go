@@ -63,7 +63,7 @@ func (s *service) UpdateStatus(ctx context.Context, status *Status) (error, Code
 	return nil, CodeOK
 }
 
-func (s *service) DeleteStatus(ctx context.Context, id string) error {
+func (s *service) DeleteStatus(ctx context.Context, id int) error {
 	return s.db.DeleteStatus(ctx, id)
 }
 

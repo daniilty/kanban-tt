@@ -10,12 +10,12 @@ type Service interface {
 	AddTask(context.Context, *Task) (error, Code)
 	GetTasks(context.Context, string) ([]*Task, error)
 	UpdateTask(context.Context, *Task) (error, Code)
-	DeleteTask(context.Context, string) error
+	DeleteTask(context.Context, int) error
 
 	AddStatus(context.Context, *Status) error
 	GetStatuses(context.Context, string) ([]*Status, error)
 	UpdateStatus(context.Context, *Status) (error, Code)
-	DeleteStatus(context.Context, string) error
+	DeleteStatus(context.Context, int) error
 }
 
 type service struct {
