@@ -24,7 +24,7 @@ func (u *userInfoResponse) writeJSON(w http.ResponseWriter) error {
 // get account info
 //
 // security:
-//    api-key: Bearer
+//    api_key: []
 // Returns operation result
 // responses:
 //    200: userInfoResponse

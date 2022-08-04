@@ -1,0 +1,409 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "title": "Tasks API.",
+    "termsOfService": "there are no TOS at this moment, use at your own risk we take no responsibility",
+    "contact": {
+      "name": "Turaev Daniil",
+      "email": "dturaev@pesda.ru"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    },
+    "version": "0.0.1"
+  },
+  "host": "api-tt.pesda.ru",
+  "basePath": "/",
+  "paths": {
+    "/api/v1/tasks/status": {
+      "put": {
+        "security": [
+          {
+            "api-key": [
+              "[]"
+            ]
+          }
+        ],
+        "description": "Update status",
+        "tags": [
+          "Status"
+        ],
+        "operationId": "statusesUpdate",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "okResponse",
+            "schema": {
+              "$ref": "#/definitions/okResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "api-key": [
+              "[]"
+            ]
+          }
+        ],
+        "description": "Add status",
+        "tags": [
+          "Status"
+        ],
+        "operationId": "statusAdd",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "okResponse",
+            "schema": {
+              "$ref": "#/definitions/okResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tasks/statuses": {
+      "get": {
+        "security": [
+          {
+            "api-key": [
+              "Bearer"
+            ]
+          }
+        ],
+        "description": "get user created statuses",
+        "tags": [
+          "Status"
+        ],
+        "operationId": "statusesGet",
+        "responses": {
+          "200": {
+            "description": "status",
+            "schema": {
+              "$ref": "#/definitions/status"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tasks/task": {
+      "put": {
+        "security": [
+          {
+            "api-key": [
+              "[]"
+            ]
+          }
+        ],
+        "description": "Update task",
+        "tags": [
+          "Task"
+        ],
+        "operationId": "taskUpdate",
+        "parameters": [
+          {
+            "name": "task",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "okResponse",
+            "schema": {
+              "$ref": "#/definitions/okResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "api-key": [
+              "[]"
+            ]
+          }
+        ],
+        "description": "Add task",
+        "tags": [
+          "Task"
+        ],
+        "operationId": "taskAdd",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "okResponse",
+            "schema": {
+              "$ref": "#/definitions/okResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tasks/tasks": {
+      "get": {
+        "security": [
+          {
+            "api-key": [
+              "[]"
+            ]
+          }
+        ],
+        "description": "get user created tasks",
+        "tags": [
+          "Task"
+        ],
+        "operationId": "tasksGet",
+        "responses": {
+          "200": {
+            "description": "task",
+            "schema": {
+              "$ref": "#/definitions/task"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Code": {
+      "type": "string",
+      "title": "Code - fail code.",
+      "x-go-package": "github.com/daniilty/kanban-tt/tasks/internal/core"
+    },
+    "errorResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "$ref": "#/definitions/Code"
+        },
+        "errorInfo": {
+          "type": "string",
+          "x-go-name": "ErrorInfo"
+        }
+      },
+      "x-go-package": "github.com/daniilty/kanban-tt/tasks/internal/server"
+    },
+    "okResponse": {
+      "type": "object",
+      "x-go-package": "github.com/daniilty/kanban-tt/tasks/internal/server"
+    },
+    "status": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "priority"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "ID"
+        },
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
+        },
+        "priority": {
+          "type": "integer",
+          "format": "uint32",
+          "x-go-name": "Priority"
+        }
+      },
+      "x-go-package": "github.com/daniilty/kanban-tt/tasks/internal/server"
+    },
+    "task": {
+      "type": "object",
+      "required": [
+        "id",
+        "content",
+        "priority",
+        "status_id"
+      ],
+      "properties": {
+        "content": {
+          "type": "string",
+          "x-go-name": "Content"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "ID"
+        },
+        "priority": {
+          "type": "integer",
+          "format": "uint32",
+          "x-go-name": "Priority"
+        },
+        "status_id": {
+          "type": "integer",
+          "format": "uint32",
+          "x-go-name": "StatusID"
+        }
+      },
+      "x-go-package": "github.com/daniilty/kanban-tt/tasks/internal/server"
+    }
+  },
+  "securityDefinitions": {
+    "api-key": {
+      "type": "apiKey",
+      "name": "Bearer",
+      "in": "header"
+    }
+  }
+}

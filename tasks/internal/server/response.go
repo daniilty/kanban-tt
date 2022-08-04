@@ -6,7 +6,9 @@ import (
 	"net/http"
 )
 
+// swagger:model
 type okResponse struct {
+	// required: true
 	jsonData interface{}
 }
 

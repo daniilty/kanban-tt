@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"errors"
+	"sort"
 
 	"github.com/daniilty/kanban-tt/tasks/internal/pg"
 )
@@ -42,16 +43,24 @@ func (s *service) GetStatuses(ctx context.Context, uid string) ([]*Status, error
 		return nil, err
 	}
 
-	return dbStatusesToView(statuses), nil
+	res := dbStatusesToView(statuses)
+	sortStatuses(res)
+
+	return res, nil
 }
 
-func (s *service) UpdateStatus(ctx context.Context, status *Status) (error, bool) {
+func (s *service) UpdateStatus(ctx context.Context, status *Status) (error, Code) {
 	err := s.db.UpdateStatus(ctx, status.toDB())
 	if err != nil {
-		return err, errors.Is(err, pg.ErrEmptyModel)
+		var code Code = CodeDBFail
+		if errors.Is(err, pg.ErrEmptyModel) {
+			code = CodeEmptyModel
+		}
+
+		return err, code
 	}
 
-	return nil, true
+	return nil, CodeOK
 }
 
 func (s *service) DeleteStatus(ctx context.Context, id string) error {
@@ -74,4 +83,14 @@ func dbStatusToView(status *pg.Status) *Status {
 		Name:     status.Name,
 		Priority: uint32(status.Priority),
 	}
+}
+
+func sortStatuses(statuses []*Status) {
+	sort.Slice(statuses, func(i, j int) bool {
+		if statuses[i].Priority == statuses[j].Priority {
+			return statuses[i].Name < statuses[j].Name
+		}
+
+		return statuses[i].Priority < statuses[j].Priority
+	})
 }

@@ -23,7 +23,7 @@
     },
     "version": "0.0.1"
   },
-  "host": "localhost",
+  "host": "api-tt.pesda.ru",
   "basePath": "/",
   "paths": {
     "/api/v1/auth/login": {

@@ -9,20 +9,42 @@ import (
 	"github.com/daniilty/kanban-tt/tasks/internal/core"
 )
 
+const (
+	// пустое имя
+	codeNameEmpty core.Code = "EMPTY_NAME"
+	// статус с таким именем уже существует
+	codeStatusWithNameExists core.Code = "STATUS_WITH_NAME_EXISTS"
+)
+
+// swagger:model
 type status struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
+	// required: true
+	ID int `json:"id"`
+	// required: true
+	Name string `json:"name"`
+	// required: true
 	Priority uint32 `json:"priority"`
 }
 
-func (s *status) validate() error {
+func (s *status) validate() (error, core.Code) {
 	if s.Name == "" {
-		return fmt.Errorf("name cannot be empty")
+		return fmt.Errorf("name cannot be empty"), codeNameEmpty
 	}
 
-	return nil
+	return nil, core.CodeOK
 }
 
+// swagger:route GET /api/v1/tasks/statuses Status statusesGet
+// get user created statuses
+//
+// security:
+//    api-key: Bearer
+// Returns operation result
+// responses:
+//    200: status
+//    400: errorResponse Bad request
+//    401: errorResponse Unauthorized
+//    500: errorResponse Internal server error
 func (h *HTTP) handleGetStatuses(w http.ResponseWriter, r *http.Request) {
 	resp := h.getStatusesResponse(r)
 
@@ -33,19 +55,37 @@ func (h *HTTP) getStatusesResponse(r *http.Request) response {
 	ctx := r.Context()
 	sub := ctx.Value(subContextVal)
 	if sub == nil {
-		return getBadRequestWithMsgResponse("no subject")
+		return getUnauthorizedWithResponse(codeUnauthorizedNoSub)
 	}
 
 	s := sub.(*claims.Subject)
 
 	tasks, err := h.service.GetStatuses(ctx, s.UID)
 	if err != nil {
-		return getInternalServerErrorResponse()
+		return getInternalServerErrorResponse(core.CodeDBFail)
 	}
 
 	return newOKResponse(tasks)
 }
 
+// swagger:route POST /api/v1/tasks/status Status statusAdd
+// Add status
+//
+// security:
+//    api-key: []
+//
+// parameters:
+//  + name: status
+//    in: body
+//    required: true
+//    type: status
+//
+// Returns operation result
+// responses:
+//    200: okResponse
+//    400: errorResponse Bad request
+//    401: errorResponse Unauthorized
+//    500: errorResponse Internal server error
 func (h *HTTP) handleAddStatus(w http.ResponseWriter, r *http.Request) {
 	resp := h.addStatusResponse(r)
 
@@ -54,25 +94,25 @@ func (h *HTTP) handleAddStatus(w http.ResponseWriter, r *http.Request) {
 
 func (h *HTTP) addStatusResponse(r *http.Request) response {
 	if r.Body == http.NoBody {
-		return getBadRequestWithMsgResponse("no payload")
+		return getBadRequestWithMsgResponse("no payload", codeEmptyBody)
 	}
 
 	status := &status{}
 
 	err := unmarshalReader(r.Body, status)
 	if err != nil {
-		return getBadRequestWithMsgResponse(fmt.Sprintf("bad body: %s", err.Error()))
+		return getBadRequestWithMsgResponse(fmt.Sprintf("bad body: %s", err.Error()), codeInvalidBodyStructure)
 	}
 
-	err = status.validate()
+	err, code := status.validate()
 	if err != nil {
-		return getBadRequestWithMsgResponse(err.Error())
+		return getBadRequestWithMsgResponse(err.Error(), code)
 	}
 
 	ctx := r.Context()
 	sub := ctx.Value(subContextVal)
 	if sub == nil {
-		return getBadRequestWithMsgResponse("no subject")
+		return getUnauthorizedWithResponse(codeUnauthorizedNoSub)
 	}
 
 	s := sub.(*claims.Subject)
@@ -84,12 +124,12 @@ func (h *HTTP) addStatusResponse(r *http.Request) response {
 	})
 	if err != nil {
 		if errors.Is(err, core.ErrStatusWithNameExists) {
-			return getBadRequestWithMsgResponse(err.Error())
+			return getBadRequestWithMsgResponse(err.Error(), codeStatusWithNameExists)
 		}
 
 		h.logger.Errorw("add task", "err", err)
 
-		return getInternalServerErrorResponse()
+		return getInternalServerErrorResponse(core.CodeDBFail)
 	}
 
 	return newOKResponse(struct{}{})
@@ -101,35 +141,53 @@ func (h *HTTP) handleUpdateStatus(w http.ResponseWriter, r *http.Request) {
 	resp.writeJSON(w)
 }
 
+// swagger:route PUT /api/v1/tasks/status Status statusesUpdate
+// Update status
+//
+// security:
+//    api-key: []
+//
+// parameters:
+//  + name: status
+//    in: body
+//    required: true
+//    type: status
+//
+// Returns operation result
+// responses:
+//    200: okResponse
+//    400: errorResponse Bad request
+//    401: errorResponse Unauthorized
+//    500: errorResponse Internal server error
 func (h *HTTP) updateStatusResponse(r *http.Request) response {
 	if r.Body == http.NoBody {
-		return getBadRequestWithMsgResponse("no payload")
+		return getBadRequestWithMsgResponse("no payload", codeEmptyBody)
 	}
 
 	status := &status{}
 
 	err := unmarshalReader(r.Body, status)
 	if err != nil {
-		return getBadRequestWithMsgResponse(fmt.Sprintf("bad body: %s", err.Error()))
+		return getBadRequestWithMsgResponse(fmt.Sprintf("bad body: %s", err.Error()), codeInvalidBodyStructure)
 	}
 
 	if status.ID < 0 {
-		return getBadRequestWithMsgResponse("id must be positive integer")
+		return getBadRequestWithMsgResponse("id must be positive integer", codeIDPositive)
 	}
 
-	err, ok := h.service.UpdateStatus(r.Context(), &core.Status{
+	err, code := h.service.UpdateStatus(r.Context(), &core.Status{
 		ID:       status.ID,
 		Name:     status.Name,
 		Priority: status.Priority,
 	})
 	if err != nil {
-		if ok {
-			return getBadRequestWithMsgResponse(err.Error())
+		if code == core.CodeEmptyModel {
+			return getBadRequestWithMsgResponse(err.Error(), code)
 		}
 
 		h.logger.Errorw("update task", "err", err)
 
-		return getInternalServerErrorResponse()
+		return getInternalServerErrorResponse(code)
 	}
 
 	return newOKResponse(struct{}{})

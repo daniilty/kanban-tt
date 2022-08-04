@@ -7,14 +7,14 @@ import (
 )
 
 type Service interface {
-	AddTask(context.Context, *Task) (error, bool)
+	AddTask(context.Context, *Task) (error, Code)
 	GetTasks(context.Context, string) ([]*Task, error)
-	UpdateTask(context.Context, *Task) (error, bool)
+	UpdateTask(context.Context, *Task) (error, Code)
 	DeleteTask(context.Context, string) error
 
 	AddStatus(context.Context, *Status) error
 	GetStatuses(context.Context, string) ([]*Status, error)
-	UpdateStatus(context.Context, *Status) (error, bool)
+	UpdateStatus(context.Context, *Status) (error, Code)
 	DeleteStatus(context.Context, string) error
 }
 

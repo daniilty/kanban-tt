@@ -15,7 +15,7 @@ func parseClaimsMiddleware(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sub, err := claims.ParseHTTPHeader(r.Header)
 		if err != nil || sub == nil {
-			resp := getUnauthorizedWithResponse()
+			resp := getUnauthorizedWithResponse(codeUnauthorizedNoSub)
 			resp.writeJSON(w)
 
 			return

@@ -9,6 +9,17 @@ import (
 	"github.com/daniilty/kanban-tt/tasks/internal/pg"
 )
 
+const (
+	// неверное значения приоритета
+	CodeInvalidPriority Code = "INVALID_PRIORITY"
+	// у нас нет статусов в бд
+	CodeNoStatuses Code = "NO_STATUSES"
+	// у нас нет статуса с таким айди в бд
+	CodeNoSuchStatus Code = "NO_SUCH_STATUS"
+	// пришла пустая структура лол
+	CodeEmptyModel Code = "EMPTY_MODEL"
+)
+
 type Task struct {
 	ID       int    `json:"id"`
 	Content  string `json:"content"`
@@ -27,17 +38,23 @@ func (t *Task) toDB() *pg.Task {
 	}
 }
 
-func (s *service) AddTask(ctx context.Context, t *Task) (error, bool) {
+func (s *service) AddTask(ctx context.Context, t *Task) (error, Code) {
 	const maxPriority = 4
 
 	if t.Priority > maxPriority {
-		return fmt.Errorf("invalid priority: cannot be bigger than %d", maxPriority), true
+		return fmt.Errorf("invalid priority: cannot be bigger than %d", maxPriority), CodeInvalidPriority
 	}
 
 	status, err := s.db.GetStatusWithLowestPriority(ctx, t.OwnerID)
 	if err != nil {
-		return err, errors.Is(err, pg.ErrNoStatuses)
+		var code Code = CodeDBFail
+		if errors.Is(err, pg.ErrNoStatuses) {
+			code = CodeNoStatuses
+		}
+
+		return err, code
 	}
+
 	t.StatusID = uint32(status.ID)
 
 	tDB := t.toDB()
@@ -46,10 +63,10 @@ func (s *service) AddTask(ctx context.Context, t *Task) (error, bool) {
 
 	err = s.db.AddTask(ctx, t.toDB())
 	if err != nil {
-		return err, false
+		return err, CodeDBFail
 	}
 
-	return nil, true
+	return nil, CodeOK
 }
 
 func (s *service) GetTasks(ctx context.Context, uid string) ([]*Task, error) {
@@ -61,26 +78,26 @@ func (s *service) GetTasks(ctx context.Context, uid string) ([]*Task, error) {
 	return dbTasksToView(tasks), nil
 }
 
-func (s *service) UpdateTask(ctx context.Context, t *Task) (error, bool) {
+func (s *service) UpdateTask(ctx context.Context, t *Task) (error, Code) {
 	exists, err := s.db.IsStatusWithIDExists(ctx, int(t.StatusID))
 	if err != nil {
-		return err, false
+		return err, CodeDBFail
 	}
 
 	if !exists {
-		return fmt.Errorf("status with such id does not exist: %d", t.StatusID), true
+		return fmt.Errorf("status with such id does not exist: %d", t.StatusID), CodeNoSuchStatus
 	}
 
 	err = s.db.UpdateTask(ctx, t.toDB())
 	if err != nil {
 		if errors.Is(err, pg.ErrEmptyModel) {
-			return err, true
+			return err, CodeEmptyModel
 		}
 
-		return err, false
+		return err, CodeDBFail
 	}
 
-	return nil, true
+	return nil, CodeOK
 }
 
 func (s *service) DeleteTask(ctx context.Context, id string) error {

@@ -1,4 +1,4 @@
-// Package classification Auth API.
+// Package classification Tasks API.
 //
 // Terms Of Service:
 //
@@ -17,11 +17,8 @@
 //     Produces:
 //     - application/json
 //
-//     Security:
-//     - api_key:
-//
 //     SecurityDefinitions:
-//     api_key:
+//     api-key:
 //          type: apiKey
 //          name: Bearer
 //          in: header
