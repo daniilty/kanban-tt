@@ -13,10 +13,10 @@ import (
 var _ Service = (*ServiceImpl)(nil)
 
 type Service interface {
-	Login(context.Context, *LoginData) (string, bool, error)
-	Register(context.Context, *UserInfo) (string, bool, error)
+	Login(context.Context, *LoginData) (string, Code, error)
+	Register(context.Context, *UserInfo) (string, Code, error)
 	RefreshSession(string) (string, error)
-	GetUserInfo(context.Context, string) (*UserInfo, bool, error)
+	GetUserInfo(context.Context, string) (*UserInfo, Code, error)
 	ConfirmUserEmail(context.Context, string) error
 	JWKS() []byte
 }

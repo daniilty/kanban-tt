@@ -1,8 +1,16 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
+
+	"github.com/daniilty/kanban-tt/auth/internal/core"
+)
+
+const (
+	codeEmptyBody             core.Code = "EMPTY_BODY"
+	codeInvalidBody           core.Code = "INVALID_BODY_STRUCTURE"
+	CodeEmailCannotBeEmpty    core.Code = "EMAIL_CANNOT_BE_EMPTY"
+	CodePasswordCannotBeEmpty core.Code = "PASSWORD_CANNOT_BE_EMPTY"
 )
 
 // swagger:model
@@ -13,16 +21,16 @@ type loginRequest struct {
 	Password string `json:"password"`
 }
 
-func (l *loginRequest) validate() error {
+func (l *loginRequest) validate() core.Code {
 	if l.Email == "" {
-		return fmt.Errorf("email cannot be empty")
+		return CodeEmailCannotBeEmpty
 	}
 
 	if l.Password == "" {
-		return fmt.Errorf("password cannot be empty")
+		return CodeEmailCannotBeEmpty
 	}
 
-	return nil
+	return core.CodeOK
 }
 
 // swagger:route POST /api/v1/auth/login Authorize user
@@ -47,30 +55,30 @@ func (h *HTTP) login(w http.ResponseWriter, r *http.Request) {
 
 func (h *HTTP) getLoginResponse(r *http.Request) response {
 	if r.Body == http.NoBody {
-		return getBadRequestWithMsgResponse("no body")
+		return getBadRequestWithMsgResponse("no body", codeEmptyBody)
 	}
 
 	l := &loginRequest{}
 
 	err := unmarshalReader(r.Body, l)
 	if err != nil {
-		return getBadRequestWithMsgResponse(err.Error())
+		return getBadRequestWithMsgResponse(err.Error(), codeInvalidBody)
 	}
 
-	err = l.validate()
-	if err != nil {
-		return getBadRequestWithMsgResponse(err.Error())
+	code := l.validate()
+	if code != core.CodeOK {
+		return getBadRequestWithMsgResponse(err.Error(), code)
 	}
 
-	accessToken, ok, err := h.service.Login(r.Context(), l.toService())
+	accessToken, code, err := h.service.Login(r.Context(), l.toService())
 	if err != nil {
-		if ok {
-			return getBadRequestWithMsgResponse(err.Error())
+		if code == core.CodeInternal {
+			h.logger.Errorw("Login user.", "err", err)
+
+			return getInternalServerErrorResponse(code)
 		}
 
-		h.logger.Errorw("Login user.", "err", err)
-
-		return getInternalServerErrorResponse()
+		return getBadRequestWithMsgResponse(err.Error(), code)
 	}
 
 	return &accessTokenResponse{

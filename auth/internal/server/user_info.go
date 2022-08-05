@@ -8,6 +8,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const (
+	codeNoHeader       = "NO_HEADER"
+	codeNoKeyParam     = "NO_KEY_URL_PARAM"
+	codeNoSuchKeyParam = "NO_SUCH_KEY"
+)
+
 // swagger:model
 type userInfoResponse struct {
 	ID             string `json:"id"`
@@ -40,18 +46,18 @@ func (h *HTTP) me(w http.ResponseWriter, r *http.Request) {
 func (h *HTTP) getMeResponse(r *http.Request) response {
 	token := parseTokenHeader(r.Header)
 	if token == "" {
-		return getUnauthorizedErrorWithMsgResponse("no header")
+		return getUnauthorizedErrorWithMsgResponse("no header", codeNoHeader)
 	}
 
-	userInfo, ok, err := h.service.GetUserInfo(r.Context(), token)
+	userInfo, code, err := h.service.GetUserInfo(r.Context(), token)
 	if err != nil {
-		if ok {
-			return getUnauthorizedErrorWithMsgResponse(err.Error())
+		if code == core.CodeInternal {
+			h.logger.Errorw("Get user info.", "err", err)
+
+			return getUnauthorizedErrorWithMsgResponse(err.Error(), code)
 		}
 
-		h.logger.Errorw("Get user info.", "err", err)
-
-		return getInternalServerErrorResponse()
+		return getInternalServerErrorResponse(code)
 	}
 
 	return convertCoreUserInfoToResponse(userInfo)
@@ -67,18 +73,18 @@ func (h *HTTP) getConfirmEmailResponse(r *http.Request) response {
 	vars := mux.Vars(r)
 	key, ok := vars["key"]
 	if !ok {
-		return getBadRequestWithMsgResponse("missing key parameter")
+		return getBadRequestWithMsgResponse("missing key parameter", codeNoHeader)
 	}
 
 	err := h.service.ConfirmUserEmail(r.Context(), key)
 	if err != nil {
 		if errors.Is(err, core.ErrNoSuchKey) {
-			return getBadRequestWithMsgResponse(err.Error())
+			return getBadRequestWithMsgResponse(err.Error(), codeNoSuchKeyParam)
 		}
 
 		h.logger.Errorw("Confirm user email.", "err", err)
 
-		return getInternalServerErrorResponse()
+		return getInternalServerErrorResponse(core.CodeInternal)
 	}
 
 	return getOkResponse(struct{}{})

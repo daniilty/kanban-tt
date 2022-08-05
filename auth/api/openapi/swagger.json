@@ -70,8 +70,8 @@
       "get": {
         "security": [
           {
-            "api-key": [
-              "Bearer"
+            "api_key": [
+              "[]"
             ]
           }
         ],
@@ -150,6 +150,10 @@
     }
   },
   "definitions": {
+    "Code": {
+      "type": "string",
+      "x-go-package": "github.com/daniilty/kanban-tt/auth/internal/core"
+    },
     "accessTokenResponse": {
       "type": "object",
       "properties": {
@@ -163,14 +167,12 @@
     "errorResponse": {
       "type": "object",
       "properties": {
+        "code": {
+          "$ref": "#/definitions/Code"
+        },
         "errorInfo": {
           "type": "string",
           "x-go-name": "ErrorInfo"
-        },
-        "status": {
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "Status"
         }
       },
       "x-go-package": "github.com/daniilty/kanban-tt/auth/internal/server"

@@ -14,26 +14,30 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-const tokenLen = 12
+const (
+	tokenLen = 12
 
-func (s *ServiceImpl) Register(ctx context.Context, user *UserInfo) (string, bool, error) {
+	CodeUserWithEmailExists Code = "USER_WITH_SUCH_EMAIL_EXISTS"
+)
+
+func (s *ServiceImpl) Register(ctx context.Context, user *UserInfo) (string, Code, error) {
 	_, err := s.usersClient.GetUserByEmail(ctx, &schema.GetUserByEmailRequest{Email: user.Email})
 	if err == nil {
-		return "", true, fmt.Errorf("user with such email already exists: %s", user.Email)
+		return "", CodeUserWithEmailExists, fmt.Errorf("user with such email already exists: %s", user.Email)
 	}
 
 	if status.Code(err) != codes.InvalidArgument {
-		return "", false, err
+		return "", CodeInternal, err
 	}
 
 	resp, err := s.usersClient.AddUser(ctx, convertUserInfoToAddUser(user))
 	if err != nil {
-		return "", false, err
+		return "", CodeInternal, err
 	}
 
 	key, err := generate.SecureToken(tokenLen)
 	if err != nil {
-		return "", false, err
+		return "", CodeInternal, err
 	}
 
 	now := time.Now()
@@ -44,7 +48,7 @@ func (s *ServiceImpl) Register(ctx context.Context, user *UserInfo) (string, boo
 		CreatedAt: &now,
 	})
 	if err != nil {
-		return "", false, err
+		return "", CodeInternal, err
 	}
 
 	confirmURL := generateConfirmLink(s.confirmURL, key)
@@ -54,7 +58,7 @@ func (s *ServiceImpl) Register(ctx context.Context, user *UserInfo) (string, boo
 		Msg: "Please confirm your email with this link: " + confirmURL.String() + " or your account will be deleted in a week",
 	})
 	if err != nil {
-		return "", false, err
+		return "", CodeInternal, err
 	}
 
 	uid := strconv.Itoa(int(resp.GetId()))
@@ -63,8 +67,8 @@ func (s *ServiceImpl) Register(ctx context.Context, user *UserInfo) (string, boo
 		UID: uid,
 	})
 	if err != nil {
-		return "", false, err
+		return "", CodeInternal, err
 	}
 
-	return accessToken, true, nil
+	return accessToken, CodeOK, nil
 }

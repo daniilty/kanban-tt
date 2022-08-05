@@ -8,12 +8,16 @@ import (
 	"github.com/daniilty/kanban-tt/schema"
 )
 
+const (
+	CodeInvalidCredentials Code = "INVALID_CREDENTIALS"
+)
+
 type LoginData struct {
 	Email    string
 	Password string
 }
 
-func (s *ServiceImpl) Login(ctx context.Context, data *LoginData) (string, bool, error) {
+func (s *ServiceImpl) Login(ctx context.Context, data *LoginData) (string, Code, error) {
 	passwordHash := getMD5Sum(data.Password)
 
 	resp, err := s.usersClient.IsValidUserCredentials(ctx, &schema.IsValidUserCredentialsRequest{
@@ -21,26 +25,26 @@ func (s *ServiceImpl) Login(ctx context.Context, data *LoginData) (string, bool,
 		PasswordHash: passwordHash,
 	})
 	if err != nil {
-		return "", false, err
+		return "", CodeInternal, err
 	}
 
 	if !resp.IsValid {
-		return "", true, fmt.Errorf("invalid credentials")
+		return "", CodeInvalidCredentials, fmt.Errorf("invalid credentials")
 	}
 
 	userResp, err := s.usersClient.GetUserByEmail(ctx, &schema.GetUserByEmailRequest{
 		Email: data.Email,
 	})
 	if err != nil {
-		return "", false, err
+		return "", CodeInternal, err
 	}
 
 	accessToken, err := s.jwtManager.Generate(&claims.Subject{
 		UID: userResp.User.GetId(),
 	})
 	if err != nil {
-		return "", false, err
+		return "", CodeInternal, err
 	}
 
-	return accessToken, true, nil
+	return accessToken, CodeOK, nil
 }
