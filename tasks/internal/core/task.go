@@ -61,7 +61,7 @@ func (s *service) AddTask(ctx context.Context, t *Task) (error, Code) {
 	now := time.Now()
 	tDB.CreatedAt = &now
 
-	err = s.db.AddTask(ctx, t.toDB())
+	err = s.db.AddTask(ctx, tDB)
 	if err != nil {
 		return err, CodeDBFail
 	}
