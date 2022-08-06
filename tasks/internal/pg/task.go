@@ -58,3 +58,11 @@ func (d *db) DeleteTask(ctx context.Context, id int) error {
 
 	return err
 }
+
+func (d *db) DeleteExpiredTasks(ctx context.Context) error {
+	const q = "delete from tasks where CURRENT_DATE - created_at > 0"
+
+	_, err := d.db.ExecContext(ctx, q)
+
+	return err
+}

@@ -7,10 +7,12 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/daniilty/kanban-tt/tasks/internal/core"
 	"github.com/daniilty/kanban-tt/tasks/internal/pg"
 	"github.com/daniilty/kanban-tt/tasks/internal/server"
+	"github.com/daniilty/kanban-tt/tasks/internal/worker"
 	"go.uber.org/zap"
 )
 
@@ -47,6 +49,13 @@ func run() error {
 	wg.Add(1)
 	go func() {
 		httpServer.Run(ctx)
+		wg.Done()
+	}()
+
+	cleaner := worker.NewTasksCleaner(24*time.Hour, d, sugaredLogger)
+	wg.Add(1)
+	go func() {
+		cleaner.Run(ctx)
 		wg.Done()
 	}()
 

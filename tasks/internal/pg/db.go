@@ -12,6 +12,7 @@ type DB interface {
 	GetTasks(context.Context, string) ([]*Task, error)
 	UpdateTask(context.Context, *Task) error
 	DeleteTask(context.Context, int) error
+	DeleteExpiredTasks(context.Context) error
 
 	AddStatus(context.Context, *Status) error
 	IsStatusWithIDExists(context.Context, int) (bool, error)
