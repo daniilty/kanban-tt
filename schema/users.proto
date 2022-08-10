@@ -9,6 +9,8 @@ service Users {
   rpc AddUser(AddUserRequest) returns (AddUserResponse) {}
   // GetUser - get user by id.
   rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
+  // GetUserTaskTTL - get user by id.
+  rpc GetUserTaskTTL(GetUserTaskTTLRequest) returns (GetUserTaskTTLResponse) {}
   // GetUserByEmail - get user by email.
   rpc GetUserByEmail(GetUserByEmailRequest) returns (GetUserByEmailResponse) {}
   // IsUserWithEmailExists - get user by email
@@ -27,6 +29,10 @@ message AddUserRequest {
 }
 
 message GetUserRequest {
+  string id = 1;
+}
+
+message GetUserTaskTTLRequest {
   string id = 1;
 }
 
@@ -57,6 +63,10 @@ message IsUserWithEmailExistsResponse {
 
 message GetUserResponse {
   User user = 1;
+}
+
+message GetUserTaskTTLResponse {
+  int64 task_ttl = 1;
 }
 
 message GetUserByEmailResponse {
