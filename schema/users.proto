@@ -11,6 +11,8 @@ service Users {
   rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
   // GetUserTaskTTL - get user by id.
   rpc GetUserTaskTTL(GetUserTaskTTLRequest) returns (GetUserTaskTTLResponse) {}
+  // GetTTLs - get available ttls.
+  rpc GetTTLs(GetTTLsRequest) returns (GetTTLsResponse) {}
   // GetUserByEmail - get user by email.
   rpc GetUserByEmail(GetUserByEmailRequest) returns (GetUserByEmailResponse) {}
   // IsUserWithEmailExists - get user by email
@@ -36,6 +38,8 @@ message GetUserTaskTTLRequest {
   string id = 1;
 }
 
+message GetTTLsRequest {}
+
 message GetUserByEmailRequest {
   string email = 1;
 }
@@ -51,6 +55,10 @@ message IsValidUserCredentialsRequest {
 
 message GetUsersRequest {
   repeated string ids = 1;
+}
+
+message GetTTLsResponse {
+  repeated int64 ttls = 1;
 }
 
 message AddUserResponse {

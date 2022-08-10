@@ -28,6 +28,8 @@ type UsersClient interface {
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
 	// GetUserTaskTTL - get user by id.
 	GetUserTaskTTL(ctx context.Context, in *GetUserTaskTTLRequest, opts ...grpc.CallOption) (*GetUserTaskTTLResponse, error)
+	// GetTTLs - get available ttls.
+	GetTTLs(ctx context.Context, in *GetTTLsRequest, opts ...grpc.CallOption) (*GetTTLsResponse, error)
 	// GetUserByEmail - get user by email.
 	GetUserByEmail(ctx context.Context, in *GetUserByEmailRequest, opts ...grpc.CallOption) (*GetUserByEmailResponse, error)
 	// IsUserWithEmailExists - get user by email
@@ -67,6 +69,15 @@ func (c *usersClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...g
 func (c *usersClient) GetUserTaskTTL(ctx context.Context, in *GetUserTaskTTLRequest, opts ...grpc.CallOption) (*GetUserTaskTTLResponse, error) {
 	out := new(GetUserTaskTTLResponse)
 	err := c.cc.Invoke(ctx, "/kanban_tt.schema.Users/GetUserTaskTTL", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *usersClient) GetTTLs(ctx context.Context, in *GetTTLsRequest, opts ...grpc.CallOption) (*GetTTLsResponse, error) {
+	out := new(GetTTLsResponse)
+	err := c.cc.Invoke(ctx, "/kanban_tt.schema.Users/GetTTLs", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -119,6 +130,8 @@ type UsersServer interface {
 	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
 	// GetUserTaskTTL - get user by id.
 	GetUserTaskTTL(context.Context, *GetUserTaskTTLRequest) (*GetUserTaskTTLResponse, error)
+	// GetTTLs - get available ttls.
+	GetTTLs(context.Context, *GetTTLsRequest) (*GetTTLsResponse, error)
 	// GetUserByEmail - get user by email.
 	GetUserByEmail(context.Context, *GetUserByEmailRequest) (*GetUserByEmailResponse, error)
 	// IsUserWithEmailExists - get user by email
@@ -142,6 +155,9 @@ func (UnimplementedUsersServer) GetUser(context.Context, *GetUserRequest) (*GetU
 }
 func (UnimplementedUsersServer) GetUserTaskTTL(context.Context, *GetUserTaskTTLRequest) (*GetUserTaskTTLResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserTaskTTL not implemented")
+}
+func (UnimplementedUsersServer) GetTTLs(context.Context, *GetTTLsRequest) (*GetTTLsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTTLs not implemented")
 }
 func (UnimplementedUsersServer) GetUserByEmail(context.Context, *GetUserByEmailRequest) (*GetUserByEmailResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserByEmail not implemented")
@@ -218,6 +234,24 @@ func _Users_GetUserTaskTTL_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UsersServer).GetUserTaskTTL(ctx, req.(*GetUserTaskTTLRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Users_GetTTLs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTTLsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServer).GetTTLs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kanban_tt.schema.Users/GetTTLs",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServer).GetTTLs(ctx, req.(*GetTTLsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -312,6 +346,10 @@ var Users_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserTaskTTL",
 			Handler:    _Users_GetUserTaskTTL_Handler,
+		},
+		{
+			MethodName: "GetTTLs",
+			Handler:    _Users_GetTTLs_Handler,
 		},
 		{
 			MethodName: "GetUserByEmail",
