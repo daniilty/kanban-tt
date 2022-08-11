@@ -4,20 +4,20 @@ import (
 	"context"
 	"time"
 
-	"github.com/daniilty/kanban-tt/tasks/internal/pg"
+	"github.com/daniilty/kanban-tt/tasks/internal/core"
 	"go.uber.org/zap"
 )
 
 type TasksCleaner struct {
 	timeout time.Duration
-	db      pg.DB
+	service core.Service
 	logger  *zap.SugaredLogger
 }
 
-func NewTasksCleaner(timeout time.Duration, db pg.DB, logger *zap.SugaredLogger) *TasksCleaner {
+func NewTasksCleaner(timeout time.Duration, service core.Service, logger *zap.SugaredLogger) *TasksCleaner {
 	return &TasksCleaner{
 		timeout: timeout,
-		db:      db,
+		service: service,
 		logger:  logger,
 	}
 }
@@ -27,7 +27,7 @@ func (t *TasksCleaner) Run(ctx context.Context) {
 
 	t.logger.Info("Starting task cleaner.")
 	for {
-		err := t.db.DeleteExpiredTasks(ctx)
+		err := t.service.DeleteExpiredTasks(ctx)
 		if err != nil {
 			t.logger.Infow("DeleteExpiredTasks", "err", err)
 		}

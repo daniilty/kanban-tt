@@ -12,6 +12,9 @@ type Service interface {
 	AddUser(context.Context, *User) (int, error)
 	GetUser(context.Context, string) (*User, bool, error)
 	GetUserByEmail(context.Context, string) (*User, bool, error)
+	GetUserTaskTTL(context.Context, string) (int, error)
+	GetDefaultTTL() int64
+	GetTTLs() []int64
 	IsUserWithEmailExists(context.Context, string) (bool, error)
 	IsValidUserCredentials(context.Context, string, string) (bool, error)
 	UpdateUser(context.Context, *User) error

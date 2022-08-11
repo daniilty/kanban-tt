@@ -2,8 +2,10 @@ package server
 
 import (
 	"context"
+	"errors"
 
 	"github.com/daniilty/kanban-tt/schema"
+	"github.com/daniilty/kanban-tt/users/internal/core"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -31,6 +33,21 @@ func (g *GRPC) GetUser(ctx context.Context, req *schema.GetUserRequest) (*schema
 
 	return &schema.GetUserResponse{
 		User: convertCoreUserToPB(user),
+	}, nil
+}
+
+func (g *GRPC) GetUserTaskTTL(ctx context.Context, req *schema.GetUserTaskTTLRequest) (*schema.GetUserTaskTTLResponse, error) {
+	ttl, err := g.service.GetUserTaskTTL(ctx, req.GetId())
+	if err != nil {
+		if errors.Is(err, core.ErrNoSuchUser) {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &schema.GetUserTaskTTLResponse{
+		TaskTtl: int64(ttl),
 	}, nil
 }
 

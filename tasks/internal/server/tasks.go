@@ -61,7 +61,7 @@ func (h *HTTP) getTasksResponse(r *http.Request) response {
 
 	s := sub.(*claims.Subject)
 
-	tasks, err := h.service.GetTasks(ctx, s.UID)
+	tasks, err := h.service.GetUserTasks(ctx, s.UID)
 	if err != nil {
 		h.logger.Errorw("get tasks", "err", err)
 
@@ -81,7 +81,7 @@ func (h *HTTP) getTasksResponse(r *http.Request) response {
 //  + name: status
 //    in: body
 //    required: true
-//    type: status
+//    type: task
 //
 // Returns operation result
 // responses:
@@ -155,7 +155,7 @@ func (h *HTTP) handleUpdateTask(w http.ResponseWriter, r *http.Request) {
 //  + name: task
 //    in: body
 //    required: true
-//    type: status
+//    type: task
 //
 // Returns operation result
 // responses:

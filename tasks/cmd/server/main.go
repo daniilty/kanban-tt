@@ -9,11 +9,13 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/daniilty/kanban-tt/schema"
 	"github.com/daniilty/kanban-tt/tasks/internal/core"
 	"github.com/daniilty/kanban-tt/tasks/internal/pg"
 	"github.com/daniilty/kanban-tt/tasks/internal/server"
 	"github.com/daniilty/kanban-tt/tasks/internal/worker"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -31,8 +33,6 @@ func run() error {
 		return err
 	}
 
-	service := core.NewService(d)
-
 	loggerCfg := zap.NewProductionConfig()
 
 	logger, err := loggerCfg.Build()
@@ -41,9 +41,20 @@ func run() error {
 	}
 
 	sugaredLogger := logger.Sugar()
-	httpServer := server.NewHTTP(cfg.httpAddr, sugaredLogger, service)
 
 	ctx, cancel := context.WithCancel(context.Background())
+
+	conn, err := grpc.DialContext(ctx, cfg.usersGRPCAddr, grpc.WithInsecure())
+	if err != nil {
+		cancel()
+
+		return err
+	}
+
+	client := schema.NewUsersClient(conn)
+	service := core.NewService(d, client)
+
+	httpServer := server.NewHTTP(cfg.httpAddr, sugaredLogger, service)
 	wg := &sync.WaitGroup{}
 
 	wg.Add(1)
@@ -52,7 +63,7 @@ func run() error {
 		wg.Done()
 	}()
 
-	cleaner := worker.NewTasksCleaner(24*time.Hour, d, sugaredLogger)
+	cleaner := worker.NewTasksCleaner(24*time.Hour, service, sugaredLogger)
 	wg.Add(1)
 	go func() {
 		cleaner.Run(ctx)

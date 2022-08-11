@@ -27,11 +27,20 @@ func (d *db) AddTask(ctx context.Context, t *Task) error {
 	return err
 }
 
-func (d *db) GetTasks(ctx context.Context, uid string) ([]*Task, error) {
+func (d *db) GetUserTasks(ctx context.Context, uid string) ([]*Task, error) {
 	const q = "select * from tasks where owner_id=$1"
 
 	tasks := []*Task{}
 	err := d.db.SelectContext(ctx, &tasks, q, uid)
+
+	return tasks, err
+}
+
+func (d *db) GetTasks(ctx context.Context) ([]*Task, error) {
+	const q = "select * from tasks"
+
+	tasks := []*Task{}
+	err := d.db.SelectContext(ctx, &tasks, q)
 
 	return tasks, err
 }
@@ -59,10 +68,10 @@ func (d *db) DeleteTask(ctx context.Context, id int) error {
 	return err
 }
 
-func (d *db) DeleteExpiredTasks(ctx context.Context) error {
-	const q = "delete from tasks where CURRENT_DATE - created_at > 0"
+func (d *db) DeleteExpiredTasks(ctx context.Context, ownerID string, ttl int) error {
+	const q = "delete from tasks where owner_id=$1 CURRENT_DATE - created_at > $2"
 
-	_, err := d.db.ExecContext(ctx, q)
+	_, err := d.db.ExecContext(ctx, q, ownerID, ttl)
 
 	return err
 }

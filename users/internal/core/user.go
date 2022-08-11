@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"time"
+
+	"github.com/daniilty/kanban-tt/users/internal/pg"
 )
 
 type User struct {
@@ -17,6 +19,7 @@ type User struct {
 func (s *ServiceImpl) AddUser(ctx context.Context, user *User) (int, error) {
 	u := user.toDB()
 	now := time.Now()
+	u.TaskTTL = s.GetDefaultTTL()
 	u.CreatedAt = &now
 
 	return s.db.AddUser(ctx, u)
@@ -38,6 +41,15 @@ func (s *ServiceImpl) GetUser(ctx context.Context, id string) (*User, bool, erro
 	}
 
 	return convertDBUserToService(user), true, nil
+}
+
+func (s *ServiceImpl) GetUserTaskTTL(ctx context.Context, id string) (int, error) {
+	ttl, err := s.db.GetUserTaskTTL(ctx, id)
+	if err != nil && errors.Is(err, pg.ErrNoRows) {
+		return 0, ErrNoSuchUser
+	}
+
+	return ttl, err
 }
 
 func (s *ServiceImpl) GetUserByEmail(ctx context.Context, email string) (*User, bool, error) {

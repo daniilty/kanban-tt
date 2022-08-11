@@ -3,7 +3,7 @@ module github.com/daniilty/kanban-tt/users
 go 1.17
 
 require (
-	github.com/daniilty/kanban-tt/schema v0.0.0-20220624195419-cd8130d602b7
+	github.com/daniilty/kanban-tt/schema v0.0.0-20220810182033-a2c5a86f0e6d
 	github.com/daniilty/pgxquery v0.0.0-20220621225232-65ffb2e42e8f
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.2.0

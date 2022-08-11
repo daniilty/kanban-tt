@@ -237,7 +237,7 @@
             "required": true,
             "schema": {
               "type": "object",
-              "$ref": "#/definitions/status"
+              "$ref": "#/definitions/task"
             }
           }
         ],
@@ -288,7 +288,7 @@
             "required": true,
             "schema": {
               "type": "object",
-              "$ref": "#/definitions/status"
+              "$ref": "#/definitions/task"
             }
           }
         ],

@@ -3,14 +3,16 @@ package core
 import (
 	"context"
 
+	"github.com/daniilty/kanban-tt/schema"
 	"github.com/daniilty/kanban-tt/tasks/internal/pg"
 )
 
 type Service interface {
 	AddTask(context.Context, *Task) (error, Code)
-	GetTasks(context.Context, string) ([]*Task, error)
+	GetUserTasks(context.Context, string) ([]*Task, error)
 	UpdateTask(context.Context, *Task) (error, Code)
 	DeleteTask(context.Context, int) error
+	DeleteExpiredTasks(context.Context) error
 
 	AddStatus(context.Context, *Status) error
 	GetStatuses(context.Context, string) ([]*Status, error)
@@ -19,11 +21,13 @@ type Service interface {
 }
 
 type service struct {
-	db pg.DB
+	db          pg.DB
+	userService schema.UsersClient
 }
 
-func NewService(db pg.DB) Service {
+func NewService(db pg.DB, userService schema.UsersClient) Service {
 	return &service{
-		db: db,
+		db:          db,
+		userService: userService,
 	}
 }

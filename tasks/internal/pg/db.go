@@ -9,10 +9,11 @@ import (
 
 type DB interface {
 	AddTask(context.Context, *Task) error
-	GetTasks(context.Context, string) ([]*Task, error)
+	GetUserTasks(context.Context, string) ([]*Task, error)
+	GetTasks(context.Context) ([]*Task, error)
 	UpdateTask(context.Context, *Task) error
 	DeleteTask(context.Context, int) error
-	DeleteExpiredTasks(context.Context) error
+	DeleteExpiredTasks(context.Context, string, int) error
 
 	AddStatus(context.Context, *Status) error
 	IsStatusWithIDExists(context.Context, int) (bool, error)

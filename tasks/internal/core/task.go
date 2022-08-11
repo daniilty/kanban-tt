@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/daniilty/kanban-tt/schema"
 	"github.com/daniilty/kanban-tt/tasks/internal/pg"
 )
 
@@ -47,12 +48,11 @@ func (s *service) AddTask(ctx context.Context, t *Task) (error, Code) {
 
 	status, err := s.db.GetStatusWithLowestPriority(ctx, t.OwnerID)
 	if err != nil {
-		var code Code = CodeDBFail
 		if errors.Is(err, pg.ErrNoStatuses) {
-			code = CodeNoStatuses
+			return err, CodeNoStatuses
 		}
 
-		return err, code
+		return err, CodeDBFail
 	}
 
 	t.StatusID = uint32(status.ID)
@@ -69,8 +69,8 @@ func (s *service) AddTask(ctx context.Context, t *Task) (error, Code) {
 	return nil, CodeOK
 }
 
-func (s *service) GetTasks(ctx context.Context, uid string) ([]*Task, error) {
-	tasks, err := s.db.GetTasks(ctx, uid)
+func (s *service) GetUserTasks(ctx context.Context, uid string) ([]*Task, error) {
+	tasks, err := s.db.GetUserTasks(ctx, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -102,6 +102,38 @@ func (s *service) UpdateTask(ctx context.Context, t *Task) (error, Code) {
 
 func (s *service) DeleteTask(ctx context.Context, id int) error {
 	return s.db.DeleteTask(ctx, id)
+}
+
+func (s *service) DeleteExpiredTasks(ctx context.Context) error {
+	userChecked := map[string]struct{}{}
+
+	tasks, err := s.db.GetTasks(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, t := range tasks {
+		_, ok := userChecked[t.OwnerID]
+		if ok {
+			continue
+		}
+
+		resp, err := s.userService.GetUserTaskTTL(ctx, &schema.GetUserTaskTTLRequest{
+			Id: t.OwnerID,
+		})
+		if err != nil {
+			return err
+		}
+
+		ttl := resp.GetTaskTtl()
+
+		err = s.db.DeleteExpiredTasks(ctx, t.OwnerID, int(ttl))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func dbTasksToView(tt []*pg.Task) []*Task {

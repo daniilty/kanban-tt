@@ -15,15 +15,16 @@ type User struct {
 	Email          string     `db:"email,omitempty"`
 	PasswordHash   string     `db:"password_hash,omitempty"`
 	EmailConfirmed bool       `db:"email_confirmed,omitempty"`
+	TaskTTL        int        `db:"task_ttl,omitempty"`
 	CreatedAt      *time.Time `db:"created_at,omitempty"`
 }
 
 func (d *db) AddUser(ctx context.Context, u *User) (int, error) {
-	const q = "insert into users(name, email, email_confirmed, password_hash, created_at) values($1, $2, $3, $4, $5) returning id;"
+	const q = "insert into users(name, email, email_confirmed, password_hash, task_ttl, created_at) values($1, $2, $3, $4, $5, $6) returning id;"
 
 	var id int
 
-	err := d.db.QueryRowContext(ctx, q, u.Name, u.Email, u.EmailConfirmed, u.PasswordHash, u.CreatedAt).Scan(&id)
+	err := d.db.QueryRowContext(ctx, q, u.Name, u.Email, u.EmailConfirmed, u.PasswordHash, u.TaskTTL, u.CreatedAt).Scan(&id)
 
 	return id, err
 }
@@ -35,6 +36,15 @@ func (d *db) GetUser(ctx context.Context, id string) (*User, error) {
 	err := d.db.GetContext(ctx, u, q, id)
 
 	return u, err
+}
+
+func (d *db) GetUserTaskTTL(ctx context.Context, id string) (int, error) {
+	const q = "select task_ttl from users where id=$1"
+
+	ttl := 0
+	err := d.db.GetContext(ctx, &ttl, q, id)
+
+	return ttl, err
 }
 
 func (d *db) GetUserByEmail(ctx context.Context, email string) (*User, error) {
