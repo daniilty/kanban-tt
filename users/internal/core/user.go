@@ -19,7 +19,7 @@ type User struct {
 func (s *ServiceImpl) AddUser(ctx context.Context, user *User) (int, error) {
 	u := user.toDB()
 	now := time.Now()
-	u.TaskTTL = s.GetDefaultTTL()
+	u.TaskTTL = int(s.GetDefaultTTL())
 	u.CreatedAt = &now
 
 	return s.db.AddUser(ctx, u)

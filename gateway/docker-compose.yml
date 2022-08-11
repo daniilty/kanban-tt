@@ -67,6 +67,7 @@ services:
     environment:
       HTTP_ADDR: :3000
       PG_CONN: postgres://${PG_USER}:${PG_PASSWORD}@postgres:5432/postgres?sslmode=disable
+      USERS_GRPC_ADDR: users-api:8000
   krakend_ce:
     image: devopsfaith/krakend:1.4.1
     volumes:
