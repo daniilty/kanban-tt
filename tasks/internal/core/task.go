@@ -39,20 +39,20 @@ func (t *Task) toDB() *pg.Task {
 	}
 }
 
-func (s *service) AddTask(ctx context.Context, t *Task) (error, Code) {
+func (s *service) AddTask(ctx context.Context, t *Task) (int, error, Code) {
 	const maxPriority = 4
 
 	if t.Priority > maxPriority {
-		return fmt.Errorf("invalid priority: cannot be bigger than %d", maxPriority), CodeInvalidPriority
+		return 0, fmt.Errorf("invalid priority: cannot be bigger than %d", maxPriority), CodeInvalidPriority
 	}
 
 	status, err := s.db.GetStatusWithLowestPriority(ctx, t.OwnerID)
 	if err != nil {
 		if errors.Is(err, pg.ErrNoStatuses) {
-			return err, CodeNoStatuses
+			return 0, err, CodeNoStatuses
 		}
 
-		return err, CodeDBFail
+		return 0, err, CodeDBFail
 	}
 
 	t.StatusID = uint32(status.ID)
@@ -61,12 +61,12 @@ func (s *service) AddTask(ctx context.Context, t *Task) (error, Code) {
 	now := time.Now()
 	tDB.CreatedAt = &now
 
-	err = s.db.AddTask(ctx, tDB)
+	id, err := s.db.AddTask(ctx, tDB)
 	if err != nil {
-		return err, CodeDBFail
+		return 0, err, CodeDBFail
 	}
 
-	return nil, CodeOK
+	return id, nil, CodeOK
 }
 
 func (s *service) GetUserTasks(ctx context.Context, uid string) ([]*Task, error) {

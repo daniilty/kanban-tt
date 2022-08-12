@@ -8,13 +8,13 @@ import (
 )
 
 type Service interface {
-	AddTask(context.Context, *Task) (error, Code)
+	AddTask(context.Context, *Task) (int, error, Code)
 	GetUserTasks(context.Context, string) ([]*Task, error)
 	UpdateTask(context.Context, *Task) (error, Code)
 	DeleteTask(context.Context, int) error
 	DeleteExpiredTasks(context.Context) error
 
-	AddStatus(context.Context, *Status) error
+	AddStatus(context.Context, *Status) (int, error)
 	GetStatuses(context.Context, string) ([]*Status, error)
 	UpdateStatus(context.Context, *Status) (error, Code)
 	DeleteStatus(context.Context, int) error

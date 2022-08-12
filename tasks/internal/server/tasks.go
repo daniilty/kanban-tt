@@ -85,7 +85,7 @@ func (h *HTTP) getTasksResponse(r *http.Request) response {
 //
 // Returns operation result
 // responses:
-//    200: okResponse
+//    200: addResponse
 //    400: errorResponse Bad request
 //    401: errorResponse Unauthorized
 //    500: errorResponse Internal server error
@@ -120,7 +120,7 @@ func (h *HTTP) addTaskResponse(r *http.Request) response {
 
 	s := sub.(*claims.Subject)
 
-	err, code = h.service.AddTask(ctx, &core.Task{
+	id, err, code := h.service.AddTask(ctx, &core.Task{
 		Content:  task.Content,
 		OwnerID:  s.UID,
 		Priority: task.Priority,
@@ -136,7 +136,9 @@ func (h *HTTP) addTaskResponse(r *http.Request) response {
 		return getInternalServerErrorResponse(code)
 	}
 
-	return newOKResponse(struct{}{})
+	return &addResponse{
+		ID: id,
+	}
 }
 
 func (h *HTTP) handleUpdateTask(w http.ResponseWriter, r *http.Request) {

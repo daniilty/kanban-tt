@@ -19,12 +19,13 @@ type Task struct {
 	CreatedAt *time.Time `db:"created_at,omitempty"`
 }
 
-func (d *db) AddTask(ctx context.Context, t *Task) error {
-	const q = "insert into tasks(content, priority, owner_id, status_id, created_at) values(:content, :priority, :owner_id, :status_id, :created_at)"
+func (d *db) AddTask(ctx context.Context, t *Task) (int, error) {
+	const q = "insert into tasks(content, priority, owner_id, status_id, created_at) values(:content, :priority, :owner_id, :status_id, :created_at) returning id"
 
-	_, err := d.db.NamedExecContext(ctx, q, t)
+	var id int
+	err := d.db.QueryRowContext(ctx, q, t).Scan(&id)
 
-	return err
+	return id, err
 }
 
 func (d *db) GetUserTasks(ctx context.Context, uid string) ([]*Task, error) {

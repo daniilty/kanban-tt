@@ -24,14 +24,14 @@ func (s *Status) toDB() *pg.Status {
 	}
 }
 
-func (s *service) AddStatus(ctx context.Context, status *Status) error {
+func (s *service) AddStatus(ctx context.Context, status *Status) (int, error) {
 	exists, err := s.db.IsStatusWithNameExists(ctx, status.Name)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	if exists {
-		return ErrStatusWithNameExists
+		return 0, ErrStatusWithNameExists
 	}
 
 	return s.db.AddStatus(ctx, status.toDB())

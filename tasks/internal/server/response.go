@@ -7,6 +7,16 @@ import (
 )
 
 // swagger:model
+type addResponse struct {
+	// required: true
+	ID int `json:"id"`
+}
+
+func (a *addResponse) writeJSON(w http.ResponseWriter) error {
+	return writeJSONResponse(w, http.StatusOK, a)
+}
+
+// swagger:model
 type okResponse struct {
 	// required: true
 	jsonData interface{}

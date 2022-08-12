@@ -84,7 +84,7 @@ func (h *HTTP) getStatusesResponse(r *http.Request) response {
 //
 // Returns operation result
 // responses:
-//    200: okResponse
+//    200: addResponse
 //    400: errorResponse Bad request
 //    401: errorResponse Unauthorized
 //    500: errorResponse Internal server error
@@ -119,7 +119,7 @@ func (h *HTTP) addStatusResponse(r *http.Request) response {
 
 	s := sub.(*claims.Subject)
 
-	err = h.service.AddStatus(ctx, &core.Status{
+	id, err := h.service.AddStatus(ctx, &core.Status{
 		Name:     status.Name,
 		Priority: status.Priority,
 		OwnerID:  s.UID,
@@ -134,7 +134,9 @@ func (h *HTTP) addStatusResponse(r *http.Request) response {
 		return getInternalServerErrorResponse(core.CodeDBFail)
 	}
 
-	return newOKResponse(struct{}{})
+	return &addResponse{
+		ID: id,
+	}
 }
 
 func (h *HTTP) handleUpdateStatus(w http.ResponseWriter, r *http.Request) {

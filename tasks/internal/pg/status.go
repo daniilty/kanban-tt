@@ -32,12 +32,13 @@ func (d *db) GetStatusWithLowestPriority(ctx context.Context, uid string) (*Stat
 	return status, err
 }
 
-func (d *db) AddStatus(ctx context.Context, s *Status) error {
-	const q = "insert into statuses(name, priority, owner_id) values(:name, :priority, :owner_id)"
+func (d *db) AddStatus(ctx context.Context, s *Status) (int, error) {
+	const q = "insert into statuses(name, priority, owner_id) values(:name, :priority, :owner_id) returning id"
 
-	_, err := d.db.NamedExecContext(ctx, q, s)
+	var id int
+	err := d.db.QueryRowContext(ctx, q, s).Scan(&id)
 
-	return err
+	return id, err
 }
 
 func (d *db) IsStatusWithIDExists(ctx context.Context, id int) (bool, error) {

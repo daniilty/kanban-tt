@@ -8,14 +8,14 @@ import (
 )
 
 type DB interface {
-	AddTask(context.Context, *Task) error
+	AddTask(context.Context, *Task) (int, error)
 	GetUserTasks(context.Context, string) ([]*Task, error)
 	GetTasks(context.Context) ([]*Task, error)
 	UpdateTask(context.Context, *Task) error
 	DeleteTask(context.Context, int) error
 	DeleteExpiredTasks(context.Context, string, int) error
 
-	AddStatus(context.Context, *Status) error
+	AddStatus(context.Context, *Status) (int, error)
 	IsStatusWithIDExists(context.Context, int) (bool, error)
 	IsStatusWithNameExists(context.Context, string) (bool, error)
 	GetStatuses(context.Context, string) ([]*Status, error)

@@ -104,9 +104,9 @@
         ],
         "responses": {
           "200": {
-            "description": "okResponse",
+            "description": "addResponse",
             "schema": {
-              "$ref": "#/definitions/okResponse"
+              "$ref": "#/definitions/addResponse"
             }
           },
           "400": {
@@ -294,9 +294,9 @@
         ],
         "responses": {
           "200": {
-            "description": "okResponse",
+            "description": "addResponse",
             "schema": {
-              "$ref": "#/definitions/okResponse"
+              "$ref": "#/definitions/addResponse"
             }
           },
           "400": {
@@ -412,6 +412,20 @@
       "type": "string",
       "title": "Code - fail code.",
       "x-go-package": "github.com/daniilty/kanban-tt/tasks/internal/core"
+    },
+    "addResponse": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "ID"
+        }
+      },
+      "x-go-package": "github.com/daniilty/kanban-tt/tasks/internal/server"
     },
     "errorResponse": {
       "type": "object",
