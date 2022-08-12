@@ -23,7 +23,15 @@ func (d *db) AddTask(ctx context.Context, t *Task) (int, error) {
 	const q = "insert into tasks(content, priority, owner_id, status_id, created_at) values(:content, :priority, :owner_id, :status_id, :created_at) returning id"
 
 	var id int
-	err := d.db.QueryRowContext(ctx, q, t).Scan(&id)
+
+	rows, err := d.db.NamedQueryContext(ctx, q, t)
+	if err != nil {
+		return 0, err
+	}
+
+	for rows.Next() {
+		rows.Scan(&id)
+	}
 
 	return id, err
 }

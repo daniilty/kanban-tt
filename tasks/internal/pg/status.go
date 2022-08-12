@@ -36,7 +36,14 @@ func (d *db) AddStatus(ctx context.Context, s *Status) (int, error) {
 	const q = "insert into statuses(name, priority, owner_id) values(:name, :priority, :owner_id) returning id"
 
 	var id int
-	err := d.db.QueryRowContext(ctx, q, s).Scan(&id)
+	rows, err := d.db.NamedQueryContext(ctx, q, s)
+	if err != nil {
+		return 0, err
+	}
+
+	for rows.Next() {
+		rows.Scan(&id)
+	}
 
 	return id, err
 }
