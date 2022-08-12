@@ -64,6 +64,7 @@ services:
       - api
     depends_on:
       - postgres
+      - users-api
     environment:
       HTTP_ADDR: :3000
       PG_CONN: postgres://${PG_USER}:${PG_PASSWORD}@postgres:5432/postgres?sslmode=disable

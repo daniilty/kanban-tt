@@ -69,7 +69,7 @@ func (d *db) DeleteTask(ctx context.Context, id int) error {
 }
 
 func (d *db) DeleteExpiredTasks(ctx context.Context, ownerID string, ttl int) error {
-	const q = "delete from tasks where owner_id=$1 CURRENT_DATE - created_at > $2"
+	const q = "delete from tasks where owner_id=$1 and CURRENT_DATE - created_at > $2"
 
 	_, err := d.db.ExecContext(ctx, q, ownerID, ttl)
 
