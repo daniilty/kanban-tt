@@ -1,11 +1,12 @@
-create table statuses(
+create table if not exists statuses(
   id serial primary key,
   name text not null,
-  priority integer not null,
-  owner_id varchar(255) not null
+  owner_id varchar(255) not null,
+  parent_id integer not null,
+  child_id integer not null
 );
 
-create table tasks(
+create table if not exists tasks(
   id serial primary key,
   content text not null,
   priority integer not null,

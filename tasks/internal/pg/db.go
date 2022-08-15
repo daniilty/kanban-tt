@@ -15,6 +15,8 @@ type DB interface {
 	DeleteTask(context.Context, int) error
 	DeleteExpiredTasks(context.Context, string, int) error
 
+	AddParent(context.Context, *Status) (int, error)
+	AddChild(context.Context, *Status) (int, error)
 	AddStatus(context.Context, *Status) (int, error)
 	IsStatusWithIDExists(context.Context, int) (bool, error)
 	IsStatusWithNameExists(context.Context, string) (bool, error)

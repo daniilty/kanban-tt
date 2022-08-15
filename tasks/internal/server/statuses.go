@@ -16,6 +16,8 @@ const (
 	codeNameEmpty core.Code = "EMPTY_NAME"
 	// статус с таким именем уже существует
 	codeStatusWithNameExists core.Code = "STATUS_WITH_NAME_EXISTS"
+	// родителя с таким айди не существует
+	codeParentDoesNotExists core.Code = "PARENT_WITH_ID_DOES_NOT_EXISTS"
 )
 
 // swagger:model
@@ -25,7 +27,7 @@ type status struct {
 	// required: true
 	Name string `json:"name"`
 	// required: true
-	Priority uint32 `json:"priority"`
+	ParentID uint32 `json:"parent_id"`
 }
 
 func (s *status) validate() (error, core.Code) {
@@ -121,12 +123,16 @@ func (h *HTTP) addStatusResponse(r *http.Request) response {
 
 	id, err := h.service.AddStatus(ctx, &core.Status{
 		Name:     status.Name,
-		Priority: status.Priority,
+		ParentID: int(status.ParentID),
 		OwnerID:  s.UID,
 	})
 	if err != nil {
 		if errors.Is(err, core.ErrStatusWithNameExists) {
 			return getBadRequestWithMsgResponse(err.Error(), codeStatusWithNameExists)
+		}
+
+		if errors.Is(err, core.ErrNoSuchParent) {
+			return getBadRequestWithMsgResponse(err.Error(), codeParentDoesNotExists)
 		}
 
 		h.logger.Errorw("add task", "err", err)
@@ -180,9 +186,8 @@ func (h *HTTP) updateStatusResponse(r *http.Request) response {
 	}
 
 	err, code := h.service.UpdateStatus(r.Context(), &core.Status{
-		ID:       status.ID,
-		Name:     status.Name,
-		Priority: status.Priority,
+		ID:   status.ID,
+		Name: status.Name,
 	})
 	if err != nil {
 		if code == core.CodeEmptyModel {
