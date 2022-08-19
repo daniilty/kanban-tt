@@ -91,6 +91,10 @@ func (g *GRPC) IsValidUserCredentials(ctx context.Context, req *schema.IsValidUs
 func (g *GRPC) UpdateUser(ctx context.Context, req *schema.UpdateUserRequest) (*schema.UpdateUserResponse, error) {
 	err := g.service.UpdateUser(ctx, convertPBUpdateUserToCore(req))
 	if err != nil {
+		if errors.Is(err, core.ErrNoSuchTTL) {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 

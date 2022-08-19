@@ -1,9 +1,9 @@
 module github.com/daniilty/kanban-tt/auth
 
-go 1.17
+go 1.18
 
 require (
-	github.com/daniilty/kanban-tt/schema v0.0.0-20220810182033-a2c5a86f0e6d
+	github.com/daniilty/kanban-tt/schema v0.0.0-20220817212823-d56773350d4a
 	github.com/gorilla/mux v1.8.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lestrrat-go/jwx v1.2.14

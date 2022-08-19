@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/url"
 
+	"github.com/daniilty/kanban-tt/auth/claims"
 	"github.com/daniilty/kanban-tt/auth/internal/jwt"
 	"github.com/daniilty/kanban-tt/auth/internal/kafka"
 	"github.com/daniilty/kanban-tt/auth/internal/pg"
@@ -15,8 +16,10 @@ var _ Service = (*ServiceImpl)(nil)
 type Service interface {
 	Login(context.Context, *LoginData) (string, Code, error)
 	Register(context.Context, *UserInfo) (string, Code, error)
+	ParseRawToken(string) (*claims.Subject, error)
 	RefreshSession(string) (string, error)
 	GetUserInfo(context.Context, string) (*UserInfo, Code, error)
+	UpdateUser(context.Context, *UserInfo) (Code, error)
 	ConfirmUserEmail(context.Context, string) error
 	JWKS() []byte
 }

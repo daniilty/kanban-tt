@@ -10,6 +10,7 @@ import (
 
 const (
 	codeNoHeader       = "NO_HEADER"
+	codeInvalidSubject = "INVALID_SUB"
 	codeNoKeyParam     = "NO_KEY_URL_PARAM"
 	codeNoSuchKeyParam = "NO_SUCH_KEY"
 )
@@ -20,6 +21,16 @@ type userInfoResponse struct {
 	Email          string `json:"email"`
 	EmailConfirmed bool   `json:"emailConfirmed"`
 	Name           string `json:"name"`
+	TaskTTL        int    `json:"taskTTL"`
+}
+
+// swagger:model
+type userRequest struct {
+	Email          string `json:"email"`
+	EmailConfirmed bool   `json:"emailConfirmed"`
+	Password       string `json:"password"`
+	Name           string `json:"name"`
+	TaskTTL        int    `json:"taskTTL"`
 }
 
 func (u *userInfoResponse) writeJSON(w http.ResponseWriter) error {
@@ -85,6 +96,52 @@ func (h *HTTP) getConfirmEmailResponse(r *http.Request) response {
 		h.logger.Errorw("Confirm user email.", "err", err)
 
 		return getInternalServerErrorResponse(core.CodeInternal)
+	}
+
+	return getOkResponse(struct{}{})
+}
+
+func (h *HTTP) updateUser(w http.ResponseWriter, r *http.Request) {
+	resp := h.getUpdateUserResponse(r)
+
+	resp.writeJSON(w)
+}
+
+func (h *HTTP) getUpdateUserResponse(r *http.Request) response {
+	token := parseTokenHeader(r.Header)
+	if token == "" {
+		return getUnauthorizedErrorWithMsgResponse("no header", codeNoHeader)
+	}
+
+	sub, err := h.service.ParseRawToken(token)
+	if err != nil {
+		return getUnauthorizedErrorWithMsgResponse("invalid subject", codeInvalidSubject)
+	}
+
+	if r.Body == http.NoBody {
+		return getBadRequestWithMsgResponse("no body", codeEmptyBody)
+	}
+
+	req := &userRequest{}
+
+	err = unmarshalReader(r.Body, req)
+	if err != nil {
+		return getBadRequestWithMsgResponse(err.Error(), codeInvalidBody)
+	}
+
+	code, err := h.service.UpdateUser(r.Context(), &core.UserInfo{
+		ID:       sub.UID,
+		Name:     req.Name,
+		Email:    req.Email,
+		TaskTTL:  req.TaskTTL,
+		Password: req.Password,
+	})
+	if err != nil {
+		if code != core.CodeInternal {
+			return getBadRequestWithMsgResponse(err.Error(), code)
+		}
+
+		h.logger.Errorw("Update user.", "err", err)
 	}
 
 	return getOkResponse(struct{}{})

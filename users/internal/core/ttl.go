@@ -1,10 +1,5 @@
 package core
 
-type TTL struct {
-	Default int
-	List    []int
-}
-
 func (s *ServiceImpl) GetDefaultTTL() int64 {
 	return defaultTTL
 }

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/daniilty/kanban-tt/users/internal/pg"
+	"github.com/daniilty/kanban-tt/users/internal/slice"
 )
 
 type User struct {
@@ -14,6 +15,7 @@ type User struct {
 	Email          string
 	EmailConfirmed bool
 	PasswordHash   string
+	TaskTTL        int
 }
 
 func (s *ServiceImpl) AddUser(ctx context.Context, user *User) (int, error) {
@@ -79,5 +81,9 @@ func (s *ServiceImpl) IsValidUserCredentials(ctx context.Context, email string, 
 }
 
 func (s *ServiceImpl) UpdateUser(ctx context.Context, user *User) error {
+	if user.TaskTTL != 0 && !slice.Contains(s.GetTTLs(), int64(user.TaskTTL)) {
+		return ErrNoSuchTTL
+	}
+
 	return s.db.UpdateUser(ctx, user.toDB())
 }

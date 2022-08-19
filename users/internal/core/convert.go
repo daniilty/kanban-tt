@@ -9,6 +9,7 @@ func (n *User) toDB() *pg.User {
 		Email:          n.Email,
 		EmailConfirmed: n.EmailConfirmed,
 		PasswordHash:   n.PasswordHash,
+		TaskTTL:        n.TaskTTL,
 	}
 }
 
