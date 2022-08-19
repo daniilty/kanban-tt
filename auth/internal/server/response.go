@@ -10,6 +10,7 @@ type response interface {
 	writeJSON(http.ResponseWriter) error
 }
 
+// swagger:model
 type okResp struct {
 	data interface{}
 }

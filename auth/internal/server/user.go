@@ -37,7 +37,7 @@ func (u *userInfoResponse) writeJSON(w http.ResponseWriter) error {
 	return writeJSONResponse(w, http.StatusOK, u)
 }
 
-// swagger:route GET /api/v1/auth/me UserInfo user
+// swagger:route GET /api/v1/auth/me UserInfo GetUser
 // get account info
 //
 // security:
@@ -101,6 +101,22 @@ func (h *HTTP) getConfirmEmailResponse(r *http.Request) response {
 	return getOkResponse(struct{}{})
 }
 
+// swagger:route PUT /api/v1/auth/me UserInfo updateUser
+// Update your account
+//
+// parameters:
+//  + name: userRequest
+//    in: body
+//    required: true
+//    type: userRequest
+// security:
+//    api_key: []
+// Returns operation result
+// responses:
+//    200: okResp
+//    400: errorResponse Bad request
+//    401: errorResponse Unauthorized
+//    500: errorResponse Internal server error
 func (h *HTTP) updateUser(w http.ResponseWriter, r *http.Request) {
 	resp := h.getUpdateUserResponse(r)
 

@@ -79,12 +79,63 @@
         "tags": [
           "UserInfo"
         ],
-        "operationId": "user",
+        "operationId": "GetUser",
         "responses": {
           "200": {
             "description": "userInfoResponse",
             "schema": {
               "$ref": "#/definitions/userInfoResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "api_key": [
+              "[]"
+            ]
+          }
+        ],
+        "description": "Update your account",
+        "tags": [
+          "UserInfo"
+        ],
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "name": "userRequest",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/userRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "okResp",
+            "schema": {
+              "$ref": "#/definitions/okResp"
             }
           },
           "400": {
@@ -114,7 +165,7 @@
         "tags": [
           "Register"
         ],
-        "operationId": "user",
+        "operationId": "registerUser",
         "parameters": [
           {
             "name": "registerRequest",
@@ -193,6 +244,10 @@
           "x-go-name": "Password"
         }
       },
+      "x-go-package": "github.com/daniilty/kanban-tt/auth/internal/server"
+    },
+    "okResp": {
+      "type": "object",
       "x-go-package": "github.com/daniilty/kanban-tt/auth/internal/server"
     },
     "registerRequest": {
