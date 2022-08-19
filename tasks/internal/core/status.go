@@ -88,7 +88,7 @@ func dbStatusesToView(ss []*pg.Status) []*Status {
 	for _, s := range ss {
 		if s.ParentID == 0 {
 			next = s
-			break
+			continue
 		}
 
 		mapped[s.ID] = s

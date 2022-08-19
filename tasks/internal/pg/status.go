@@ -24,7 +24,7 @@ func (s *Status) isInDB() bool {
 }
 
 func (d *db) GetStatusWithLowestPriority(ctx context.Context, uid string) (*Status, error) {
-	const q = "select * from statuses where owner_id=$1 where parent_id=0"
+	const q = "select * from statuses where owner_id=$1 and parent_id=0"
 
 	status := &Status{}
 
