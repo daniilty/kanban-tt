@@ -236,6 +236,38 @@
         "name": {
           "type": "string",
           "x-go-name": "Name"
+        },
+        "taskTTL": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "TaskTTL"
+        }
+      },
+      "x-go-package": "github.com/daniilty/kanban-tt/auth/internal/server"
+    },
+    "userRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "x-go-name": "Email"
+        },
+        "emailConfirmed": {
+          "type": "boolean",
+          "x-go-name": "EmailConfirmed"
+        },
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
+        },
+        "password": {
+          "type": "string",
+          "x-go-name": "Password"
+        },
+        "taskTTL": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "TaskTTL"
         }
       },
       "x-go-package": "github.com/daniilty/kanban-tt/auth/internal/server"
