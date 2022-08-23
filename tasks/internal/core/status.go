@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"errors"
+	"strconv"
 
 	"github.com/daniilty/kanban-tt/tasks/internal/pg"
 )
@@ -56,22 +57,78 @@ func (s *service) GetStatuses(ctx context.Context, uid string) ([]*Status, error
 	return dbStatusesToView(statuses), nil
 }
 
-func (s *service) UpdateStatus(ctx context.Context, status *Status) (error, Code) {
-	err := s.db.UpdateStatus(ctx, status.toDB())
+func (s *service) UpdateStatusName(ctx context.Context, status *Status) (Code, error) {
+	dbStatus, code, err := s.getDBStatusFor(ctx, status.ID, strconv.Itoa(status.ParentID))
 	if err != nil {
-		var code Code = CodeDBFail
-		if errors.Is(err, pg.ErrEmptyModel) {
-			code = CodeEmptyModel
-		}
-
-		return err, code
+		return code, err
 	}
 
-	return nil, CodeOK
+	if dbStatus.Name == status.Name {
+		return CodeOK, nil
+	}
+
+	err = s.db.UpdateStatusName(ctx, status.ID, status.Name)
+	if err != nil {
+		return CodeDBFail, err
+	}
+
+	return CodeOK, nil
 }
 
-func (s *service) DeleteStatus(ctx context.Context, id int) error {
-	return s.db.DeleteStatus(ctx, id)
+func (s *service) UpdateStatusParent(ctx context.Context, status *Status) (Code, error) {
+	dbStatus, code, err := s.getDBStatusFor(ctx, status.ID, status.OwnerID)
+	if err != nil {
+		return code, err
+	}
+
+	if dbStatus.ParentID == status.ParentID {
+		return CodeOK, nil
+	}
+
+	if status.ParentID != 0 {
+		_, code, err = s.getDBStatusFor(ctx, status.ParentID, status.OwnerID)
+		if err != nil {
+			return code, err
+		}
+	}
+
+	err = s.db.UpdateStatusParent(ctx, dbStatus, status.ParentID)
+	if err != nil {
+		return CodeDBFail, err
+	}
+
+	return CodeOK, nil
+}
+
+func (s *service) DeleteStatus(ctx context.Context, uid int, id int) (Code, error) {
+	status, code, err := s.getDBStatusFor(ctx, id, strconv.Itoa(id))
+	if err != nil {
+		return code, err
+	}
+
+	err = s.db.DeleteStatus(ctx, status)
+	if err != nil {
+		return CodeDBFail, err
+	}
+
+	return CodeOK, nil
+}
+
+func (s *service) getDBStatusFor(ctx context.Context, statusID int, ownerID string) (*pg.Status, Code, error) {
+	status, err := s.db.GetStatus(ctx, statusID)
+	if err != nil {
+		if errors.Is(err, pg.ErrNoStatuses) {
+			return nil, CodeNoSuchStatus, err
+		}
+
+		return nil, CodeDBFail, err
+	}
+
+	if status.OwnerID != ownerID {
+		return nil, CodeNotPermitted, ErrNotPermitted
+	}
+
+	return status, CodeOK, nil
 }
 
 func dbStatusesToView(ss []*pg.Status) []*Status {

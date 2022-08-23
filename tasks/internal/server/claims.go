@@ -7,8 +7,10 @@ import (
 	"github.com/daniilty/kanban-tt/auth/claims"
 )
 
+type sub string
+
 const (
-	subContextVal = "sub"
+	subContextVal sub = "sub"
 )
 
 func parseClaimsMiddleware(h http.HandlerFunc) http.HandlerFunc {

@@ -14,3 +14,5 @@ create table if not exists tasks(
   created_at date not null,
   status_id integer references statuses(id) on delete cascade
 );
+
+create index statuses_owner_idx on statuses(owner_id);
