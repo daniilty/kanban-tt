@@ -16,7 +16,8 @@ type Service interface {
 
 	AddStatus(context.Context, *Status) (int, error)
 	GetStatuses(context.Context, string) ([]*Status, error)
-	UpdateStatus(context.Context, *Status) (Code, error)
+	UpdateStatusName(context.Context, *Status) (Code, error)
+	UpdateStatusParent(context.Context, *Status) (Code, error)
 	DeleteStatus(context.Context, int, int) (Code, error)
 }
 

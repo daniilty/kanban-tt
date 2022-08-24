@@ -27,7 +27,7 @@ type status struct {
 	// required: true
 	Name string `json:"name"`
 	// required: true
-	ParentID uint32 `json:"parent_id"`
+	ParentID uint32 `json:"parentId"`
 }
 
 func (s *status) validate() (error, core.Code) {
@@ -59,7 +59,7 @@ func (h *HTTP) getStatusesResponse(r *http.Request) response {
 	ctx := r.Context()
 	sub := ctx.Value(subContextVal)
 	if sub == nil {
-		return getUnauthorizedWithResponse(codeUnauthorizedNoSub)
+		return getUnauthorizedResponse(codeUnauthorizedNoSub)
 	}
 
 	s := sub.(*claims.Subject)
@@ -116,7 +116,7 @@ func (h *HTTP) addStatusResponse(r *http.Request) response {
 	ctx := r.Context()
 	sub := ctx.Value(subContextVal)
 	if sub == nil {
-		return getUnauthorizedWithResponse(codeUnauthorizedNoSub)
+		return getUnauthorizedResponse(codeUnauthorizedNoSub)
 	}
 
 	s := sub.(*claims.Subject)
@@ -135,7 +135,7 @@ func (h *HTTP) addStatusResponse(r *http.Request) response {
 			return getBadRequestWithMsgResponse(err.Error(), codeParentDoesNotExists)
 		}
 
-		h.logger.Errorw("add task", "err", err)
+		h.logger.Errorw("Add status.", "err", err)
 
 		return getInternalServerErrorResponse(core.CodeDBFail)
 	}
@@ -145,14 +145,14 @@ func (h *HTTP) addStatusResponse(r *http.Request) response {
 	}
 }
 
-func (h *HTTP) handleUpdateStatus(w http.ResponseWriter, r *http.Request) {
-	resp := h.updateStatusResponse(r)
+func (h *HTTP) handleUpdateStatusName(w http.ResponseWriter, r *http.Request) {
+	resp := h.updateStatusNameResponse(r)
 
 	resp.writeJSON(w)
 }
 
-// swagger:route PUT /api/v1/tasks/status Status statusesUpdate
-// Update status
+// swagger:route PUT /api/v1/tasks/status/name Status statusNameUpdate
+// Update status name
 //
 // security:
 //    api-key: []
@@ -168,8 +168,9 @@ func (h *HTTP) handleUpdateStatus(w http.ResponseWriter, r *http.Request) {
 //    200: okResponse
 //    400: errorResponse Bad request
 //    401: errorResponse Unauthorized
+//    403: errorResponse Forbidden
 //    500: errorResponse Internal server error
-func (h *HTTP) updateStatusResponse(r *http.Request) response {
+func (h *HTTP) updateStatusNameResponse(r *http.Request) response {
 	if r.Body == http.NoBody {
 		return getBadRequestWithMsgResponse("no payload", codeEmptyBody)
 	}
@@ -185,18 +186,102 @@ func (h *HTTP) updateStatusResponse(r *http.Request) response {
 		return getBadRequestWithMsgResponse("id must be positive integer", codeIDPositive)
 	}
 
-	err, code := h.service.UpdateStatus(r.Context(), &core.Status{
-		ID:   status.ID,
-		Name: status.Name,
+	ctx := r.Context()
+	sub := ctx.Value(subContextVal)
+	if sub == nil {
+		return getUnauthorizedResponse(codeUnauthorizedNoSub)
+	}
+
+	s := sub.(*claims.Subject)
+
+	code, err := h.service.UpdateStatusName(ctx, &core.Status{
+		ID:      status.ID,
+		Name:    status.Name,
+		OwnerID: s.UID,
 	})
 	if err != nil {
-		if code == core.CodeEmptyModel {
-			return getBadRequestWithMsgResponse(err.Error(), code)
+		if code == core.CodeDBFail {
+			h.logger.Errorw("Update status.", "err", err)
+
+			return getInternalServerErrorResponse(code)
 		}
 
-		h.logger.Errorw("update task", "err", err)
+		if code == core.CodeNotPermitted {
+			return getForbiddenResponse(code)
+		}
 
-		return getInternalServerErrorResponse(code)
+		return getBadRequestWithMsgResponse(err.Error(), code)
+	}
+
+	return newOKResponse(struct{}{})
+}
+
+func (h *HTTP) handleUpdateStatusParent(w http.ResponseWriter, r *http.Request) {
+	resp := h.updateStatusParentResponse(r)
+
+	resp.writeJSON(w)
+}
+
+// swagger:route PUT /api/v1/tasks/status/parent Status statusParentUpdate
+// Update status parent(provide 0 parentId if you want to add status to the head)
+//
+// security:
+//    api-key: []
+//
+// parameters:
+//  + name: status
+//    in: body
+//    required: true
+//    type: status
+//
+// Returns operation result
+// responses:
+//    200: okResponse
+//    400: errorResponse Bad request
+//    401: errorResponse Unauthorized
+//    403: errorResponse Forbidden
+//    500: errorResponse Internal server error
+func (h *HTTP) updateStatusParentResponse(r *http.Request) response {
+	if r.Body == http.NoBody {
+		return getBadRequestWithMsgResponse("no payload", codeEmptyBody)
+	}
+
+	status := &status{}
+
+	err := unmarshalReader(r.Body, status)
+	if err != nil {
+		return getBadRequestWithMsgResponse(fmt.Sprintf("bad body: %s", err.Error()), codeInvalidBodyStructure)
+	}
+
+	if status.ID < 0 {
+		return getBadRequestWithMsgResponse("id must be positive integer", codeIDPositive)
+	}
+
+	ctx := r.Context()
+	sub := ctx.Value(subContextVal)
+	if sub == nil {
+		return getUnauthorizedResponse(codeUnauthorizedNoSub)
+	}
+
+	s := sub.(*claims.Subject)
+
+	code, err := h.service.UpdateStatusParent(ctx, &core.Status{
+		ID:       status.ID,
+		ParentID: int(status.ParentID),
+		OwnerID:  s.UID,
+	})
+	if err != nil {
+		if code == core.CodeDBFail {
+			h.logger.Errorw("Update status.", "err", err)
+
+			return getInternalServerErrorResponse(code)
+		}
+
+		if code == core.CodeNotPermitted {
+			return getForbiddenResponse(code)
+		}
+
+		return getBadRequestWithMsgResponse(err.Error(), code)
 	}
 
 	return newOKResponse(struct{}{})
@@ -239,9 +324,31 @@ func (h *HTTP) deleteStatusResponse(r *http.Request) response {
 		return getBadRequestWithMsgResponse(msg, codeInvalidIDType)
 	}
 
-	err = h.service.DeleteStatus(r.Context(), id)
+	ctx := r.Context()
+	sub := ctx.Value(subContextVal)
+	if sub == nil {
+		return getUnauthorizedResponse(codeUnauthorizedNoSub)
+	}
+
+	s := sub.(*claims.Subject)
+	uid, err := strconv.Atoi(s.UID)
 	if err != nil {
-		return getInternalServerErrorResponse(core.CodeDBFail)
+		return getUnauthorizedResponse(codeUnauthorizedNoSub)
+	}
+
+	code, err := h.service.DeleteStatus(ctx, uid, id)
+	if err != nil {
+		if code == core.CodeDBFail {
+			h.logger.Errorw("Delete status.", "err", err)
+
+			return getInternalServerErrorResponse(core.CodeDBFail)
+		}
+
+		if code == core.CodeNotPermitted {
+			return getForbiddenResponse(code)
+		}
+
+		return getBadRequestWithMsgResponse(err.Error(), code)
 	}
 
 	return newOKResponse(struct{}{})

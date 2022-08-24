@@ -56,7 +56,7 @@ func (h *HTTP) getTasksResponse(r *http.Request) response {
 	ctx := r.Context()
 	sub := ctx.Value(subContextVal)
 	if sub == nil {
-		return getUnauthorizedWithResponse(codeUnauthorizedNoSub)
+		return getUnauthorizedResponse(codeUnauthorizedNoSub)
 	}
 
 	s := sub.(*claims.Subject)
@@ -115,7 +115,7 @@ func (h *HTTP) addTaskResponse(r *http.Request) response {
 	ctx := r.Context()
 	sub := ctx.Value(subContextVal)
 	if sub == nil {
-		return getUnauthorizedWithResponse(codeUnauthorizedNoSub)
+		return getUnauthorizedResponse(codeUnauthorizedNoSub)
 	}
 
 	s := sub.(*claims.Subject)

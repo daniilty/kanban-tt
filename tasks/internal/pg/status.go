@@ -211,10 +211,12 @@ func (d *db) UpdateStatusParent(ctx context.Context, s *Status, parentID int) er
 	}
 
 	// set a new child for a task's parent
-	_, err = tx.ExecContext(ctx, updateParentQ, s.ChildID, s.ParentID)
-	if err != nil {
-		tx.Rollback()
-		return err
+	if s.ParentID != 0 {
+		_, err = tx.ExecContext(ctx, updateParentQ, s.ChildID, s.ParentID)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
 	}
 
 	// set a new parent for a task's child

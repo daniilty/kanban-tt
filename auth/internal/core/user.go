@@ -30,25 +30,18 @@ type UserInfo struct {
 }
 
 func (u *UserInfo) hasOneChangedField() bool {
-	i := 0
-
-	if u.Name != "" {
-		i++
+	switch {
+	case u.Name != "":
+		return true
+	case u.Email != "":
+		return true
+	case u.Password != "":
+		return true
+	case u.TaskTTL != 0:
+		return true
+	default:
+		return false
 	}
-
-	if u.Email != "" {
-		i++
-	}
-
-	if u.Password != "" {
-		i++
-	}
-
-	if u.TaskTTL != 0 {
-		i++
-	}
-
-	return i > 0
 }
 
 func (u *UserInfo) toUpdateUser() (*schema.UpdateUserRequest, error) {

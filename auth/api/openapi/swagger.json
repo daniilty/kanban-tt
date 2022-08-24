@@ -292,7 +292,7 @@
           "type": "string",
           "x-go-name": "Name"
         },
-        "taskTTL": {
+        "taskTtl": {
           "type": "integer",
           "format": "int64",
           "x-go-name": "TaskTTL"

@@ -21,7 +21,7 @@ type userInfoResponse struct {
 	Email          string `json:"email"`
 	EmailConfirmed bool   `json:"emailConfirmed"`
 	Name           string `json:"name"`
-	TaskTTL        int    `json:"taskTTL"`
+	TaskTTL        int    `json:"taskTtl"`
 }
 
 // swagger:model

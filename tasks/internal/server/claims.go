@@ -13,11 +13,11 @@ const (
 	subContextVal sub = "sub"
 )
 
-func parseClaimsMiddleware(h http.HandlerFunc) http.HandlerFunc {
+func withParseClaimsMiddleware(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sub, err := claims.ParseHTTPHeader(r.Header)
 		if err != nil || sub == nil {
-			resp := getUnauthorizedWithResponse(codeUnauthorizedNoSub)
+			resp := getUnauthorizedResponse(codeUnauthorizedNoSub)
 			resp.writeJSON(w)
 
 			return
