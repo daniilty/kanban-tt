@@ -8,6 +8,8 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+type parentSetFunc func(context.Context, *sqlx.Tx, *Status, int) (*Status, error)
+
 type Status struct {
 	ID       int    `db:"id,primarykey"`
 	Name     string `db:"name,omitempty"`
@@ -210,49 +212,15 @@ func (d *db) UpdateStatusParent(ctx context.Context, s *Status, parentID int) er
 		return err
 	}
 
-	// set a new child for a task's parent
-	if s.ParentID != 0 {
-		_, err = tx.ExecContext(ctx, updateParentQ, s.ChildID, s.ParentID)
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
+	err = removeStatusFromListTx(ctx, tx, s)
+	if err != nil {
+		tx.Rollback()
+		return err
 	}
 
-	// set a new parent for a task's child
-	if s.ChildID != 0 {
-		_, err = tx.ExecContext(ctx, updateChildQ, s.ParentID, s.ChildID)
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
+	set := getParentSetFunc(parentID)
 
-	// if wants to be a new head, set parent a new head
-	var parent *Status
-	if parentID == 0 {
-		parent, err = getHeadStatusTx(tx, s.OwnerID)
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-	} else {
-		parent, err = getStatusTx(tx, parentID)
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
-
-	if parent.ChildID != 0 {
-		_, err = tx.ExecContext(ctx, updateChildQ, s.ID, parent.ChildID)
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
-
-	_, err = tx.ExecContext(ctx, updateParentQ, s.ID, parent.ID)
+	parent, err := set(ctx, tx, s, parentID)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -329,6 +297,31 @@ func (d *db) GetStatus(ctx context.Context, id int) (*Status, error) {
 	return s, err
 }
 
+func removeStatusFromListTx(ctx context.Context, tx *sqlx.Tx, s *Status) error {
+	const (
+		updateParentQ = "update statuses set child_id=$1 where id=$2"
+		updateChildQ  = "update statuses set parent_id=$1 where id=$2"
+	)
+
+	// set a new child for a task's parent
+	if s.ParentID != 0 {
+		_, err := tx.ExecContext(ctx, updateParentQ, s.ChildID, s.ParentID)
+		if err != nil {
+			return err
+		}
+	}
+
+	// set a new parent for a task's child
+	if s.ChildID != 0 {
+		_, err := tx.ExecContext(ctx, updateChildQ, s.ParentID, s.ChildID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func getStatusTx(tx *sqlx.Tx, id int) (*Status, error) {
 	const selectQ = "select id, name, owner_id, parent_id, child_id from statuses where id=$1"
 
@@ -355,4 +348,48 @@ func getHeadStatusTx(tx *sqlx.Tx, uid string) (*Status, error) {
 	}
 
 	return s, err
+}
+
+func getParentSetFunc(parentID int) parentSetFunc {
+	if parentID == 0 {
+		return setNewHeadStatusTx
+	}
+
+	return setNewParentStatusTx
+}
+
+func setNewHeadStatusTx(ctx context.Context, tx *sqlx.Tx, s *Status, _ int) (*Status, error) {
+	const updateChildQ = "update statuses set parent_id=$1 where id=$2"
+
+	head, err := getHeadStatusTx(tx, s.OwnerID)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = tx.ExecContext(ctx, updateChildQ, s.ID, head.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	// set fake parent
+	head.ChildID = head.ID
+	head.ID = 0
+
+	return head, nil
+}
+
+func setNewParentStatusTx(ctx context.Context, tx *sqlx.Tx, s *Status, parentID int) (*Status, error) {
+	const updateParentQ = "update statuses set child_id=$1 where id=$2"
+
+	parent, err := getStatusTx(tx, parentID)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = tx.ExecContext(ctx, updateParentQ, s.ID, parent.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return parent, nil
 }

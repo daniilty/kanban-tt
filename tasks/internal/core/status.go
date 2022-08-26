@@ -101,7 +101,7 @@ func (s *service) UpdateStatusParent(ctx context.Context, status *Status) (Code,
 }
 
 func (s *service) DeleteStatus(ctx context.Context, uid int, id int) (Code, error) {
-	status, code, err := s.getDBStatusFor(ctx, id, strconv.Itoa(id))
+	status, code, err := s.getDBStatusFor(ctx, id, strconv.Itoa(uid))
 	if err != nil {
 		return code, err
 	}
