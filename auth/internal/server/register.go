@@ -52,7 +52,7 @@ func (r *registerRequest) validate() (core.Code, error) {
 	return core.CodeOK, err
 }
 
-// swagger:route POST /api/v1/auth/register Register user
+// swagger:route POST /api/v1/auth/register Register registerUser
 // Register user
 //
 // parameters:

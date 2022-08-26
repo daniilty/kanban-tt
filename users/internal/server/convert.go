@@ -22,6 +22,7 @@ func convertPBUpdateUserToCore(user *schema.UpdateUserRequest) *core.User {
 		Email:          user.Email,
 		PasswordHash:   user.PasswordHash,
 		EmailConfirmed: user.EmailConfirmed,
+		TaskTTL:        int(user.TaskTtl),
 	}
 }
 

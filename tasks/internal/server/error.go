@@ -25,11 +25,19 @@ func getBadRequestWithMsgResponse(msg string, code core.Code) errorResponse {
 	}
 }
 
-func getUnauthorizedWithResponse(code core.Code) errorResponse {
+func getUnauthorizedResponse(code core.Code) errorResponse {
 	return errorResponse{
 		Status:    http.StatusUnauthorized,
 		Code:      code,
 		ErrorInfo: http.StatusText(http.StatusUnauthorized),
+	}
+}
+
+func getForbiddenResponse(code core.Code) errorResponse {
+	return errorResponse{
+		Status:    http.StatusForbidden,
+		Code:      code,
+		ErrorInfo: http.StatusText(http.StatusForbidden),
 	}
 }
 

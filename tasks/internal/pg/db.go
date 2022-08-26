@@ -15,13 +15,17 @@ type DB interface {
 	DeleteTask(context.Context, int) error
 	DeleteExpiredTasks(context.Context, string, int) error
 
+	AddParent(context.Context, *Status) (int, error)
+	AddChild(context.Context, *Status) (int, error)
 	AddStatus(context.Context, *Status) (int, error)
 	IsStatusWithIDExists(context.Context, int) (bool, error)
 	IsStatusWithNameExists(context.Context, string) (bool, error)
 	GetStatuses(context.Context, string) ([]*Status, error)
+	GetStatus(context.Context, int) (*Status, error)
 	GetStatusWithLowestPriority(context.Context, string) (*Status, error)
-	UpdateStatus(context.Context, *Status) error
-	DeleteStatus(context.Context, int) error
+	UpdateStatusName(context.Context, int, string) error
+	UpdateStatusParent(context.Context, *Status, int) error
+	DeleteStatus(context.Context, *Status) error
 }
 
 func Connect(ctx context.Context, addr string) (DB, error) {

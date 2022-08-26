@@ -40,7 +40,7 @@ func (t *Task) toDB() *pg.Task {
 }
 
 func (s *service) AddTask(ctx context.Context, t *Task) (int, error, Code) {
-	const maxPriority = 4
+	const maxPriority = 5
 
 	if t.Priority > maxPriority {
 		return 0, fmt.Errorf("invalid priority: cannot be bigger than %d", maxPriority), CodeInvalidPriority

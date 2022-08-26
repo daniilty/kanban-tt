@@ -3,7 +3,7 @@ package core
 import (
 	"context"
 	"errors"
-	"sort"
+	"strconv"
 
 	"github.com/daniilty/kanban-tt/tasks/internal/pg"
 )
@@ -11,16 +11,18 @@ import (
 type Status struct {
 	ID       int    `json:"id"`
 	Name     string `json:"name"`
-	Priority uint32 `json:"priority"`
 	OwnerID  string `json:"owner_id,omitempty"`
+	ParentID int    `json:"parent_id,omitempty"`
+	ChildID  int    `json:"child_id,omitempty"`
 }
 
 func (s *Status) toDB() *pg.Status {
 	return &pg.Status{
 		ID:       s.ID,
 		Name:     s.Name,
-		Priority: int(s.Priority),
 		OwnerID:  s.OwnerID,
+		ParentID: s.ParentID,
+		ChildID:  s.ChildID,
 	}
 }
 
@@ -34,7 +36,16 @@ func (s *service) AddStatus(ctx context.Context, status *Status) (int, error) {
 		return 0, ErrStatusWithNameExists
 	}
 
-	return s.db.AddStatus(ctx, status.toDB())
+	if status.ParentID == 0 {
+		return s.db.AddParent(ctx, status.toDB())
+	}
+
+	id, err := s.db.AddChild(ctx, status.toDB())
+	if err != nil && errors.Is(err, pg.ErrNoStatuses) {
+		return 0, ErrNoSuchParent
+	}
+
+	return id, err
 }
 
 func (s *service) GetStatuses(ctx context.Context, uid string) ([]*Status, error) {
@@ -43,35 +54,118 @@ func (s *service) GetStatuses(ctx context.Context, uid string) ([]*Status, error
 		return nil, err
 	}
 
-	res := dbStatusesToView(statuses)
-	sortStatuses(res)
-
-	return res, nil
+	return dbStatusesToView(statuses), nil
 }
 
-func (s *service) UpdateStatus(ctx context.Context, status *Status) (error, Code) {
-	err := s.db.UpdateStatus(ctx, status.toDB())
+func (s *service) UpdateStatusName(ctx context.Context, status *Status) (Code, error) {
+	dbStatus, code, err := s.getDBStatusFor(ctx, status.ID, strconv.Itoa(status.ParentID))
 	if err != nil {
-		var code Code = CodeDBFail
-		if errors.Is(err, pg.ErrEmptyModel) {
-			code = CodeEmptyModel
-		}
-
-		return err, code
+		return code, err
 	}
 
-	return nil, CodeOK
+	if dbStatus.Name == status.Name {
+		return CodeOK, nil
+	}
+
+	err = s.db.UpdateStatusName(ctx, status.ID, status.Name)
+	if err != nil {
+		return CodeDBFail, err
+	}
+
+	return CodeOK, nil
 }
 
-func (s *service) DeleteStatus(ctx context.Context, id int) error {
-	return s.db.DeleteStatus(ctx, id)
+func (s *service) UpdateStatusParent(ctx context.Context, status *Status) (Code, error) {
+	dbStatus, code, err := s.getDBStatusFor(ctx, status.ID, status.OwnerID)
+	if err != nil {
+		return code, err
+	}
+
+	if dbStatus.ParentID == status.ParentID {
+		return CodeOK, nil
+	}
+
+	if status.ParentID != 0 {
+		_, code, err = s.getDBStatusFor(ctx, status.ParentID, status.OwnerID)
+		if err != nil {
+			return code, err
+		}
+	}
+
+	err = s.db.UpdateStatusParent(ctx, dbStatus, status.ParentID)
+	if err != nil {
+		return CodeDBFail, err
+	}
+
+	return CodeOK, nil
+}
+
+func (s *service) DeleteStatus(ctx context.Context, uid int, id int) (Code, error) {
+	status, code, err := s.getDBStatusFor(ctx, id, strconv.Itoa(uid))
+	if err != nil {
+		return code, err
+	}
+
+	err = s.db.DeleteStatus(ctx, status)
+	if err != nil {
+		return CodeDBFail, err
+	}
+
+	return CodeOK, nil
+}
+
+func (s *service) getDBStatusFor(ctx context.Context, statusID int, ownerID string) (*pg.Status, Code, error) {
+	status, err := s.db.GetStatus(ctx, statusID)
+	if err != nil {
+		if errors.Is(err, pg.ErrNoStatuses) {
+			return nil, CodeNoSuchStatus, err
+		}
+
+		return nil, CodeDBFail, err
+	}
+
+	if status.OwnerID != ownerID {
+		return nil, CodeNotPermitted, ErrNotPermitted
+	}
+
+	return status, CodeOK, nil
 }
 
 func dbStatusesToView(ss []*pg.Status) []*Status {
-	res := make([]*Status, 0, len(ss))
+	if len(ss) == 0 {
+		return []*Status{}
+	}
 
-	for i := range ss {
-		res = append(res, dbStatusToView(ss[i]))
+	// root node
+	var next *pg.Status = nil
+
+	res := make([]*Status, 0, len(ss))
+	mapped := make(map[int]*pg.Status, len(ss))
+
+	for _, s := range ss {
+		if s.ParentID == 0 {
+			next = s
+			continue
+		}
+
+		mapped[s.ID] = s
+	}
+
+	// cannot build statuses if no root(wtf?)
+	if next == nil {
+		return []*Status{}
+	}
+
+	res = append(res, dbStatusToView(next))
+
+	for next.ChildID != 0 {
+		child, ok := mapped[next.ChildID]
+		if !ok {
+			break
+		}
+
+		res = append(res, dbStatusToView(child))
+		next = child
 	}
 
 	return res
@@ -79,18 +173,7 @@ func dbStatusesToView(ss []*pg.Status) []*Status {
 
 func dbStatusToView(status *pg.Status) *Status {
 	return &Status{
-		ID:       status.ID,
-		Name:     status.Name,
-		Priority: uint32(status.Priority),
+		ID:   status.ID,
+		Name: status.Name,
 	}
-}
-
-func sortStatuses(statuses []*Status) {
-	sort.Slice(statuses, func(i, j int) bool {
-		if statuses[i].Priority == statuses[j].Priority {
-			return statuses[i].Name < statuses[j].Name
-		}
-
-		return statuses[i].Priority < statuses[j].Priority
-	})
 }

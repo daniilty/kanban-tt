@@ -27,57 +27,6 @@
   "basePath": "/",
   "paths": {
     "/api/v1/tasks/status": {
-      "put": {
-        "security": [
-          {
-            "api-key": [
-              "[]"
-            ]
-          }
-        ],
-        "description": "Update status",
-        "tags": [
-          "Status"
-        ],
-        "operationId": "statusesUpdate",
-        "parameters": [
-          {
-            "name": "status",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "$ref": "#/definitions/status"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "okResponse",
-            "schema": {
-              "$ref": "#/definitions/okResponse"
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "schema": {
-              "$ref": "#/definitions/errorResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/errorResponse"
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorResponse"
-            }
-          }
-        }
-      },
       "post": {
         "security": [
           {
@@ -117,6 +66,124 @@
           },
           "401": {
             "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tasks/status/name": {
+      "put": {
+        "security": [
+          {
+            "api-key": [
+              "[]"
+            ]
+          }
+        ],
+        "description": "Update status name",
+        "tags": [
+          "Status"
+        ],
+        "operationId": "statusNameUpdate",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "okResponse",
+            "schema": {
+              "$ref": "#/definitions/okResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tasks/status/parent": {
+      "put": {
+        "security": [
+          {
+            "api-key": [
+              "[]"
+            ]
+          }
+        ],
+        "description": "Update status parent(provide 0 parentId if you want to add status to the head)",
+        "tags": [
+          "Status"
+        ],
+        "operationId": "statusParentUpdate",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "okResponse",
+            "schema": {
+              "$ref": "#/definitions/okResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "schema": {
               "$ref": "#/definitions/errorResponse"
             }
@@ -449,7 +516,7 @@
       "required": [
         "id",
         "name",
-        "priority"
+        "parentId"
       ],
       "properties": {
         "id": {
@@ -461,10 +528,10 @@
           "type": "string",
           "x-go-name": "Name"
         },
-        "priority": {
+        "parentId": {
           "type": "integer",
           "format": "uint32",
-          "x-go-name": "Priority"
+          "x-go-name": "ParentID"
         }
       },
       "x-go-package": "github.com/daniilty/kanban-tt/tasks/internal/server"
