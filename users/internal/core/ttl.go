@@ -5,7 +5,7 @@ func (s *ServiceImpl) GetDefaultTTL() int64 {
 }
 
 func (s *ServiceImpl) GetTTLs() []int64 {
-	listCopy := make([]int64, 0, len(ttlList))
+	listCopy := make([]int64, len(ttlList))
 	copy(listCopy, ttlList)
 
 	return listCopy
