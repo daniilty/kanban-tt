@@ -66,6 +66,8 @@ func (h *HTTP) getStatusesResponse(r *http.Request) response {
 
 	tasks, err := h.service.GetStatuses(ctx, s.UID)
 	if err != nil {
+		h.logger.Errorw("Get statuses.", "err", err)
+
 		return getInternalServerErrorResponse(core.CodeDBFail)
 	}
 

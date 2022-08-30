@@ -54,7 +54,7 @@ func (s *service) GetStatuses(ctx context.Context, uid string) ([]*Status, error
 		return nil, err
 	}
 
-	return dbStatusesToView(statuses), nil
+	return buildStatusList(statuses)
 }
 
 func (s *service) UpdateStatusName(ctx context.Context, status *Status) (Code, error) {
@@ -131,9 +131,9 @@ func (s *service) getDBStatusFor(ctx context.Context, statusID int, ownerID stri
 	return status, CodeOK, nil
 }
 
-func dbStatusesToView(ss []*pg.Status) []*Status {
+func buildStatusList(ss []*pg.Status) ([]*Status, error) {
 	if len(ss) == 0 {
-		return []*Status{}
+		return []*Status{}, nil
 	}
 
 	// root node
@@ -153,7 +153,7 @@ func dbStatusesToView(ss []*pg.Status) []*Status {
 
 	// cannot build statuses if no root(wtf?)
 	if next == nil {
-		return []*Status{}
+		return nil, errors.New("no root in linked list")
 	}
 
 	res = append(res, dbStatusToView(next))
@@ -168,7 +168,7 @@ func dbStatusesToView(ss []*pg.Status) []*Status {
 		next = child
 	}
 
-	return res
+	return res, nil
 }
 
 func dbStatusToView(status *pg.Status) *Status {

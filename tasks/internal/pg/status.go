@@ -272,7 +272,7 @@ func (d *db) DeleteStatus(ctx context.Context, s *Status) error {
 		}
 	}
 
-	_, err = d.db.ExecContext(ctx, deleteQ, s.ID)
+	_, err = tx.ExecContext(ctx, deleteQ, s.ID)
 	if err != nil {
 		tx.Rollback()
 		return err
