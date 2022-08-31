@@ -194,7 +194,7 @@ func (d *db) GetStatuses(ctx context.Context, uid string) ([]*Status, error) {
 func (d *db) UpdateStatusName(ctx context.Context, id int, name string) error {
 	const q = "update statuses set name=$1 where id=$2"
 
-	_, err := d.db.ExecContext(ctx, name, id)
+	_, err := d.db.ExecContext(ctx, q, name, id)
 
 	return err
 }

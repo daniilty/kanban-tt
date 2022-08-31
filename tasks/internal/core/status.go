@@ -58,7 +58,7 @@ func (s *service) GetStatuses(ctx context.Context, uid string) ([]*Status, error
 }
 
 func (s *service) UpdateStatusName(ctx context.Context, status *Status) (Code, error) {
-	dbStatus, code, err := s.getDBStatusFor(ctx, status.ID, strconv.Itoa(status.ParentID))
+	dbStatus, code, err := s.getDBStatusFor(ctx, status.ID, status.OwnerID)
 	if err != nil {
 		return code, err
 	}
