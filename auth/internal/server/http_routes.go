@@ -32,4 +32,8 @@ func (h *HTTP) setRoutes(r *mux.Router) {
 	api.HandleFunc("/confirm_email/{key}",
 		h.confirmEmail,
 	).Methods(http.MethodGet)
+
+	api.HandleFunc("/task_ttls",
+		h.getTaskTTLs,
+	).Methods(http.MethodGet)
 }

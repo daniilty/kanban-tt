@@ -19,6 +19,7 @@ type Service interface {
 	ParseRawToken(string) (*claims.Subject, error)
 	RefreshSession(string) (string, error)
 	GetUserInfo(context.Context, string) (*UserInfo, Code, error)
+	GetTTLs(context.Context) []int64
 	UpdateUser(context.Context, *UserInfo) (Code, error)
 	ConfirmUserEmail(context.Context, string) error
 	JWKS() []byte

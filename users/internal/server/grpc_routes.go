@@ -51,6 +51,14 @@ func (g *GRPC) GetUserTaskTTL(ctx context.Context, req *schema.GetUserTaskTTLReq
 	}, nil
 }
 
+func (g *GRPC) GetTTLs(ctx context.Context, req *schema.GetTTLsRequest) (*schema.GetTTLsResponse, error) {
+	ttls := g.service.GetTTLs()
+
+	return &schema.GetTTLsResponse{
+		Ttls: ttls,
+	}, nil
+}
+
 func (g *GRPC) GetUserByEmail(ctx context.Context, req *schema.GetUserByEmailRequest) (*schema.GetUserByEmailResponse, error) {
 	user, ok, err := g.service.GetUserByEmail(ctx, req.GetEmail())
 	if err != nil {

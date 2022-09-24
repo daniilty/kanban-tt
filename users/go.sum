@@ -23,6 +23,8 @@ github.com/daniilty/kanban-tt/schema v0.0.0-20220810182033-a2c5a86f0e6d h1:oOtiA
 github.com/daniilty/kanban-tt/schema v0.0.0-20220810182033-a2c5a86f0e6d/go.mod h1:p2q3LRirtXmk7c7T5meM8LlXHzPNtvk9dkr43y0ub+s=
 github.com/daniilty/kanban-tt/schema v0.0.0-20220817212823-d56773350d4a h1:o0Bb6DNsoAppCH/AZTB7VfwV847pkoi82N090jlHjUI=
 github.com/daniilty/kanban-tt/schema v0.0.0-20220817212823-d56773350d4a/go.mod h1:p2q3LRirtXmk7c7T5meM8LlXHzPNtvk9dkr43y0ub+s=
+github.com/daniilty/kanban-tt/schema v0.0.0-20220831225745-0fd1a4df4193 h1:MQzCUvgae0XfhKKz5HrSJKlgreXQYwTu4XfVEfDSEIU=
+github.com/daniilty/kanban-tt/schema v0.0.0-20220831225745-0fd1a4df4193/go.mod h1:p2q3LRirtXmk7c7T5meM8LlXHzPNtvk9dkr43y0ub+s=
 github.com/daniilty/pgxquery v0.0.0-20220621225232-65ffb2e42e8f h1:blO6mqaiR/qrfO4XUzPfG2LP8eZHxg798RvRyAu/sko=
 github.com/daniilty/pgxquery v0.0.0-20220621225232-65ffb2e42e8f/go.mod h1:FL1L9ca7nlvcoEajyy5N+hDHdO61UIDZTXfcE1I0IL4=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

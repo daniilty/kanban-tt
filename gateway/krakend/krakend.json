@@ -160,6 +160,25 @@
 			}]
 		},
 		{
+			"endpoint": "/api/v1/auth/task_ttls",
+			"method": "GET",
+			"output_encoding": "no-op",
+			"querystring_params": [
+				"*"
+			],
+			"headers_to_pass": [
+				"*"
+			],
+			"backend": [{
+				"url_pattern": "/api/v1/auth/task_ttls",
+				"host": [
+					"http://auth-api:3000"
+				],
+				"encoding": "no-op",
+				"disable_host_sanitize": true
+			}]
+		},
+		{
 			"endpoint": "/api/v1/tasks/task",
 			"method": "POST",
 			"output_encoding": "no-op",
