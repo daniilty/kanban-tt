@@ -27,7 +27,7 @@ func (s *Status) toDB() *pg.Status {
 }
 
 func (s *service) AddStatus(ctx context.Context, status *Status) (int, error) {
-	exists, err := s.db.IsStatusWithNameExists(ctx, status.Name)
+	exists, err := s.db.IsStatusWithNameExists(ctx, status.Name, status.OwnerID)
 	if err != nil {
 		return 0, err
 	}

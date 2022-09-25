@@ -19,7 +19,7 @@ type DB interface {
 	AddChild(context.Context, *Status) (int, error)
 	AddStatus(context.Context, *Status) (int, error)
 	IsStatusWithIDExists(context.Context, int) (bool, error)
-	IsStatusWithNameExists(context.Context, string) (bool, error)
+	IsStatusWithNameExists(context.Context, string, string) (bool, error)
 	GetStatuses(context.Context, string) ([]*Status, error)
 	GetStatus(context.Context, int) (*Status, error)
 	GetStatusWithLowestPriority(context.Context, string) (*Status, error)

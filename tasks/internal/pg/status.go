@@ -173,11 +173,11 @@ func (d *db) IsStatusWithIDExists(ctx context.Context, id int) (bool, error) {
 	return exists, err
 }
 
-func (d *db) IsStatusWithNameExists(ctx context.Context, name string) (bool, error) {
-	const q = "select exists(select from statuses where name=$1)"
+func (d *db) IsStatusWithNameExists(ctx context.Context, name string, uid string) (bool, error) {
+	const q = "select exists(select from statuses where name=$1 and owner_id=$2)"
 
 	exists := false
-	err := d.db.GetContext(ctx, &exists, q, name)
+	err := d.db.GetContext(ctx, &exists, q, name, uid)
 
 	return exists, err
 }
