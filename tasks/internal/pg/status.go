@@ -41,7 +41,7 @@ func (d *db) GetStatusWithLowestPriority(ctx context.Context, uid string) (*Stat
 
 func (d *db) AddParent(ctx context.Context, s *Status) (int, error) {
 	const (
-		selectRootQ = "select id, name, owner_id, parent_id, child_id from statuses where parent_id=0"
+		selectRootQ = "select id, name, owner_id, parent_id, child_id from statuses where parent_id=0 and owner_id=$1"
 		updateRootQ = "update statuses set parent_id=$1 where id=$2"
 	)
 
@@ -51,7 +51,7 @@ func (d *db) AddParent(ctx context.Context, s *Status) (int, error) {
 	}
 
 	root := &Status{}
-	err = tx.QueryRowxContext(ctx, selectRootQ).Scan(
+	err = tx.QueryRowxContext(ctx, selectRootQ, s.OwnerID).Scan(
 		&root.ID, &root.Name, &root.OwnerID, &root.ParentID, &root.ChildID,
 	)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
