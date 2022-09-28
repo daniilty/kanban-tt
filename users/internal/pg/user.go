@@ -92,3 +92,11 @@ func (d *db) UpdateUser(ctx context.Context, u *User) error {
 
 	return err
 }
+
+func (d *db) UnconfirmEmail(ctx context.Context, id string) error {
+	const q = "update users set email_confirmed=false, created_at=$1 where id=$2"
+
+	_, err := d.db.ExecContext(ctx, q, time.Now(), id)
+
+	return err
+}

@@ -18,5 +18,6 @@ func convertPBUserToUserInfo(u *schema.User) *UserInfo {
 		Email:          u.Email,
 		Name:           u.Name,
 		EmailConfirmed: u.EmailConfirmed,
+		TaskTTL:        int(u.TaskTtl),
 	}
 }

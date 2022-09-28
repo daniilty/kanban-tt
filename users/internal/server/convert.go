@@ -32,6 +32,7 @@ func convertCoreUserToPB(user *core.User) *schema.User {
 		Name:           user.Name,
 		Email:          user.Email,
 		EmailConfirmed: user.EmailConfirmed,
+		TaskTtl:        int64(user.TaskTTL),
 	}
 }
 

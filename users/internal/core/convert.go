@@ -20,5 +20,6 @@ func convertDBUserToService(user *pg.User) *User {
 		Email:          user.Email,
 		EmailConfirmed: user.EmailConfirmed,
 		PasswordHash:   user.PasswordHash,
+		TaskTTL:        user.TaskTTL,
 	}
 }

@@ -25,6 +25,10 @@ github.com/daniilty/kanban-tt/schema v0.0.0-20220817212823-d56773350d4a h1:o0Bb6
 github.com/daniilty/kanban-tt/schema v0.0.0-20220817212823-d56773350d4a/go.mod h1:p2q3LRirtXmk7c7T5meM8LlXHzPNtvk9dkr43y0ub+s=
 github.com/daniilty/kanban-tt/schema v0.0.0-20220831225745-0fd1a4df4193 h1:MQzCUvgae0XfhKKz5HrSJKlgreXQYwTu4XfVEfDSEIU=
 github.com/daniilty/kanban-tt/schema v0.0.0-20220831225745-0fd1a4df4193/go.mod h1:p2q3LRirtXmk7c7T5meM8LlXHzPNtvk9dkr43y0ub+s=
+github.com/daniilty/kanban-tt/schema v0.0.0-20220928133039-d87add1451e7 h1:j57wnSVpDMVoZcPyznvEotoOOkb46/g4mBJjPGtEgSA=
+github.com/daniilty/kanban-tt/schema v0.0.0-20220928133039-d87add1451e7/go.mod h1:p2q3LRirtXmk7c7T5meM8LlXHzPNtvk9dkr43y0ub+s=
+github.com/daniilty/kanban-tt/schema v0.0.0-20220928142046-a8f4819f80fa h1:NgXkYKlOXMxsofbifcQ+rDOr5FrLs4BGyjn5JQuk0oo=
+github.com/daniilty/kanban-tt/schema v0.0.0-20220928142046-a8f4819f80fa/go.mod h1:p2q3LRirtXmk7c7T5meM8LlXHzPNtvk9dkr43y0ub+s=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

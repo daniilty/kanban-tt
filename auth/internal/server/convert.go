@@ -23,5 +23,6 @@ func convertCoreUserInfoToResponse(u *core.UserInfo) *userInfoResponse {
 		Email:          u.Email,
 		Name:           u.Name,
 		EmailConfirmed: u.EmailConfirmed,
+		TaskTTL:        u.TaskTTL,
 	}
 }

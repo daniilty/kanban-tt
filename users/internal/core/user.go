@@ -87,3 +87,7 @@ func (s *ServiceImpl) UpdateUser(ctx context.Context, user *User) error {
 
 	return s.db.UpdateUser(ctx, user.toDB())
 }
+
+func (s *ServiceImpl) UnconfirmEmail(ctx context.Context, id string) error {
+	return s.db.UnconfirmEmail(ctx, id)
+}

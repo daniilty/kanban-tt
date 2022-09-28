@@ -16,6 +16,7 @@ type DB interface {
 	IsUserWithEmailExists(context.Context, string) (bool, error)
 	IsUserWithEmailPasswordExists(context.Context, string, string) (bool, error)
 	UpdateUser(context.Context, *User) error
+	UnconfirmEmail(context.Context, string) error
 }
 
 func Connect(ctx context.Context, addr string) (DB, error) {

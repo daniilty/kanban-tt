@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"strconv"
 
 	"github.com/daniilty/kanban-tt/schema"
 	"github.com/daniilty/kanban-tt/users/internal/core"
@@ -107,4 +108,13 @@ func (g *GRPC) UpdateUser(ctx context.Context, req *schema.UpdateUserRequest) (*
 	}
 
 	return &schema.UpdateUserResponse{}, nil
+}
+
+func (g *GRPC) UnconfirmUserEmail(ctx context.Context, req *schema.UnconfirmUserEmailRequest) (*schema.UnconfirmUserEmailResponse, error) {
+	err := g.service.UnconfirmEmail(ctx, strconv.Itoa(int(req.GetId())))
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &schema.UnconfirmUserEmailResponse{}, nil
 }

@@ -18,6 +18,7 @@ type Service interface {
 	IsUserWithEmailExists(context.Context, string) (bool, error)
 	IsValidUserCredentials(context.Context, string, string) (bool, error)
 	UpdateUser(context.Context, *User) error
+	UnconfirmEmail(context.Context, string) error
 }
 
 type ServiceImpl struct {
