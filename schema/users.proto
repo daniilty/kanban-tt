@@ -101,5 +101,6 @@ message User {
   string name = 2;
   string email = 4;
   bool email_confirmed = 5;
+  int64 task_ttl = 6;
 }
 
