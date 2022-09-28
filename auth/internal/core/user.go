@@ -137,6 +137,15 @@ func (s *ServiceImpl) UpdateUser(ctx context.Context, user *UserInfo) (Code, err
 		}
 
 		if user.Email != resp.User.Email {
+			_, err := s.usersClient.GetUserByEmail(ctx, &schema.GetUserByEmailRequest{Email: user.Email})
+			if err == nil {
+				return CodeUserWithEmailExists, fmt.Errorf("user with such email already exists: %s", user.Email)
+			}
+
+			if status.Code(err) != codes.InvalidArgument {
+				return CodeInternal, err
+			}
+
 			_, err = s.usersClient.UnconfirmUserEmail(ctx, &schema.UnconfirmUserEmailRequest{
 				Id: req.Id,
 			})
