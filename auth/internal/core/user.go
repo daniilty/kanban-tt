@@ -166,7 +166,7 @@ func (s *ServiceImpl) UpdateUser(ctx context.Context, user *UserInfo) (Code, err
 				To: user.Email,
 				Msg: `<div style="background-color: #e0e0e0; padding: 50px; border-radius: 10px; color: #8a8383; display: flex; align-items: center; flex-direction: column;">
 <h1>Welcome to Kanban Task Tracker!</h1>
-<strong>Please confirm your email with link below, or your account will be blocked in a week.</strong><br/><a style="background-color: #e0e0e0; padding: 20px; margin-top: 20px; border-radius: 23px; background: #E0E0E0; box-shadow: 10px 10px 20px #bebebe,-10px -10px 20px #ffffff; text-decoration: none;font-weight:bold;color: #8a8383" href="` +
+<strong>Please confirm new email with link below, or your account will be blocked in a week.</strong><br/><a style="background-color: #e0e0e0; padding: 20px; margin-top: 20px; border-radius: 23px; background: #E0E0E0; box-shadow: 10px 10px 20px #bebebe,-10px -10px 20px #ffffff; text-decoration: none;font-weight:bold;color: #8a8383" href="` +
 					confirmURL.String() +
 					`">Confirm email</a></div>`,
 			})
