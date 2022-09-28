@@ -38,6 +38,8 @@ type UsersClient interface {
 	IsValidUserCredentials(ctx context.Context, in *IsValidUserCredentialsRequest, opts ...grpc.CallOption) (*IsValidUserCredentialsResponse, error)
 	// UpdateUser - update user by id.
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
+	// UnconfirmUserEmail - set email confirmed to false.
+	UnconfirmUserEmail(ctx context.Context, in *UnconfirmUserEmailRequest, opts ...grpc.CallOption) (*UnconfirmUserEmailResponse, error)
 }
 
 type usersClient struct {
@@ -120,6 +122,15 @@ func (c *usersClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opt
 	return out, nil
 }
 
+func (c *usersClient) UnconfirmUserEmail(ctx context.Context, in *UnconfirmUserEmailRequest, opts ...grpc.CallOption) (*UnconfirmUserEmailResponse, error) {
+	out := new(UnconfirmUserEmailResponse)
+	err := c.cc.Invoke(ctx, "/kanban_tt.schema.Users/UnconfirmUserEmail", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UsersServer is the server API for Users service.
 // All implementations must embed UnimplementedUsersServer
 // for forward compatibility
@@ -140,6 +151,8 @@ type UsersServer interface {
 	IsValidUserCredentials(context.Context, *IsValidUserCredentialsRequest) (*IsValidUserCredentialsResponse, error)
 	// UpdateUser - update user by id.
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
+	// UnconfirmUserEmail - set email confirmed to false.
+	UnconfirmUserEmail(context.Context, *UnconfirmUserEmailRequest) (*UnconfirmUserEmailResponse, error)
 	mustEmbedUnimplementedUsersServer()
 }
 
@@ -170,6 +183,9 @@ func (UnimplementedUsersServer) IsValidUserCredentials(context.Context, *IsValid
 }
 func (UnimplementedUsersServer) UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
+}
+func (UnimplementedUsersServer) UnconfirmUserEmail(context.Context, *UnconfirmUserEmailRequest) (*UnconfirmUserEmailResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnconfirmUserEmail not implemented")
 }
 func (UnimplementedUsersServer) mustEmbedUnimplementedUsersServer() {}
 
@@ -328,6 +344,24 @@ func _Users_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Users_UnconfirmUserEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UnconfirmUserEmailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServer).UnconfirmUserEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kanban_tt.schema.Users/UnconfirmUserEmail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServer).UnconfirmUserEmail(ctx, req.(*UnconfirmUserEmailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Users_ServiceDesc is the grpc.ServiceDesc for Users service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -366,6 +400,10 @@ var Users_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateUser",
 			Handler:    _Users_UpdateUser_Handler,
+		},
+		{
+			MethodName: "UnconfirmUserEmail",
+			Handler:    _Users_UnconfirmUserEmail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

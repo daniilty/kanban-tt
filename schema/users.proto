@@ -21,6 +21,8 @@ service Users {
   rpc IsValidUserCredentials(IsValidUserCredentialsRequest) returns (IsValidUserCredentialsResponse) {}
   // UpdateUser - update user by id.
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {}
+  // UnconfirmUserEmail - set email confirmed to false.
+  rpc UnconfirmUserEmail(UnconfirmUserEmailRequest) returns (UnconfirmUserEmailResponse) {}
 }
 
 message AddUserRequest {
@@ -104,3 +106,8 @@ message User {
   int64 task_ttl = 6;
 }
 
+message UnconfirmUserEmailRequest {
+  int64 id = 1;
+}
+
+message UnconfirmUserEmailResponse {}
