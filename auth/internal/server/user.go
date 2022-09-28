@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/daniilty/kanban-tt/auth/internal/core"
+	"github.com/daniilty/kanban-tt/auth/internal/validate"
 	"github.com/gorilla/mux"
 )
 
@@ -41,13 +42,16 @@ func (u *userInfoResponse) writeJSON(w http.ResponseWriter) error {
 // get account info
 //
 // security:
-//    api_key: []
+//
+//	api_key: []
+//
 // Returns operation result
 // responses:
-//    200: userInfoResponse
-//    400: errorResponse Bad request
-//    401: errorResponse Unauthorized
-//    500: errorResponse Internal server error
+//
+//	200: userInfoResponse
+//	400: errorResponse Bad request
+//	401: errorResponse Unauthorized
+//	500: errorResponse Internal server error
 func (h *HTTP) me(w http.ResponseWriter, r *http.Request) {
 	resp := h.getMeResponse(r)
 
@@ -105,18 +109,22 @@ func (h *HTTP) getConfirmEmailResponse(r *http.Request) response {
 // Update your account
 //
 // parameters:
-//  + name: userRequest
-//    in: body
-//    required: true
-//    type: userRequest
+//   - name: userRequest
+//     in: body
+//     required: true
+//     type: userRequest
+//
 // security:
-//    api_key: []
+//
+//	api_key: []
+//
 // Returns operation result
 // responses:
-//    200: okResp
-//    400: errorResponse Bad request
-//    401: errorResponse Unauthorized
-//    500: errorResponse Internal server error
+//
+//	200: okResp
+//	400: errorResponse Bad request
+//	401: errorResponse Unauthorized
+//	500: errorResponse Internal server error
 func (h *HTTP) updateUser(w http.ResponseWriter, r *http.Request) {
 	resp := h.getUpdateUserResponse(r)
 
@@ -143,6 +151,13 @@ func (h *HTTP) getUpdateUserResponse(r *http.Request) response {
 	err = unmarshalReader(r.Body, req)
 	if err != nil {
 		return getBadRequestWithMsgResponse(err.Error(), codeInvalidBody)
+	}
+
+	if req.Password != "" {
+		err = validate.Password(req.Password, 8, false)
+		if err != nil {
+			return getBadRequestWithMsgResponse(err.Error(), codeInvalidPassword)
+		}
 	}
 
 	code, err := h.service.UpdateUser(r.Context(), &core.UserInfo{
