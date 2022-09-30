@@ -44,6 +44,9 @@ func (s *ServiceImpl) Register(ctx context.Context, user *UserInfo) (string, Cod
 			log = zap.NewNop().Sugar()
 		}
 
+		ctx, cancel := context.WithTimeout(context.Background(), timeout)
+		defer cancel()
+
 		key, err := generate.SecureToken(tokenLen)
 		if err != nil {
 			log.Errorw("generate secure config", "err", err, "uid", resp.GetId())
