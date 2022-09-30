@@ -111,3 +111,14 @@ message UnconfirmUserEmailRequest {
 }
 
 message UnconfirmUserEmailResponse {}
+
+message UserEvent {
+  enum EVENT_TYPE{
+      ADD = 0;
+      UPDATE = 1;
+      DELETE = 2;
+   }
+
+  EVENT_TYPE event = 1;
+  User user = 2;
+}
