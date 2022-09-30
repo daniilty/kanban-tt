@@ -56,16 +56,17 @@ func (r *registerRequest) validate() (core.Code, error) {
 // Register user
 //
 // parameters:
-//  + name: registerRequest
-//    in: body
-//    required: true
-//    type: registerRequest
+//   - name: registerRequest
+//     in: body
+//     required: true
+//     type: registerRequest
 //
 // Returns operation result
 // responses:
-//    200: accessTokenResponse
-//    400: errorResponse Bad request
-//    500: errorResponse Internal server error
+//
+//	200: accessTokenResponse
+//	400: errorResponse Bad request
+//	500: errorResponse Internal server error
 func (h *HTTP) register(w http.ResponseWriter, r *http.Request) {
 	resp := h.getRegisterResponse(r)
 
@@ -95,7 +96,7 @@ func (h *HTTP) getRegisterResponse(r *http.Request) response {
 			return getBadRequestWithMsgResponse(err.Error(), code)
 		}
 
-		h.logger.Errorw("Register user.", "err", err)
+		h.log.Errorw("Register user.", "err", err)
 
 		return getInternalServerErrorResponse(code)
 	}

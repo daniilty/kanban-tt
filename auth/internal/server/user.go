@@ -67,7 +67,7 @@ func (h *HTTP) getMeResponse(r *http.Request) response {
 	userInfo, code, err := h.service.GetUserInfo(r.Context(), token)
 	if err != nil {
 		if code == core.CodeInternal {
-			h.logger.Errorw("Get user info.", "err", err)
+			h.log.Errorw("Get user info.", "err", err)
 
 			return getUnauthorizedErrorWithMsgResponse(err.Error(), code)
 		}
@@ -97,7 +97,7 @@ func (h *HTTP) getConfirmEmailResponse(r *http.Request) response {
 			return getBadRequestWithMsgResponse(err.Error(), codeNoSuchKeyParam)
 		}
 
-		h.logger.Errorw("Confirm user email.", "err", err)
+		h.log.Errorw("Confirm user email.", "err", err)
 
 		return getInternalServerErrorResponse(core.CodeInternal)
 	}
@@ -172,7 +172,7 @@ func (h *HTTP) getUpdateUserResponse(r *http.Request) response {
 			return getBadRequestWithMsgResponse(err.Error(), code)
 		}
 
-		h.logger.Errorw("Update user.", "err", err)
+		h.log.Errorw("Update user.", "err", err)
 	}
 
 	return getOkResponse(struct{}{})

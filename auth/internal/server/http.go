@@ -15,12 +15,12 @@ import (
 type HTTP struct {
 	innerServer *http.Server
 
-	logger  *zap.SugaredLogger
+	log     *zap.SugaredLogger
 	service core.Service
 }
 
 func (h *HTTP) Run(ctx context.Context) {
-	h.logger.Infow("HTTP server starting.", "addr", h.innerServer.Addr)
+	h.log.Infow("HTTP server starting.", "addr", h.innerServer.Addr)
 
 	go func() {
 		err := h.innerServer.ListenAndServe()
@@ -29,20 +29,20 @@ func (h *HTTP) Run(ctx context.Context) {
 				return
 			}
 
-			h.logger.Errorw("Listen and serve HTTP", "addr", h.innerServer.Addr, "err", err)
+			h.log.Errorw("Listen and serve HTTP", "addr", h.innerServer.Addr, "err", err)
 		}
 	}()
 
 	<-ctx.Done()
 
-	h.logger.Info("Graceful server shutdown.")
+	h.log.Info("Graceful server shutdown.")
 	h.innerServer.Shutdown(context.Background())
 }
 
 // NewHTTP - constructor.
 func NewHTTP(addr string, logger *zap.SugaredLogger, service core.Service) *HTTP {
 	h := &HTTP{
-		logger:  logger,
+		log:     logger,
 		service: service,
 	}
 

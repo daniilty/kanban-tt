@@ -10,6 +10,7 @@ import (
 	"github.com/daniilty/kanban-tt/auth/internal/generate"
 	"github.com/daniilty/kanban-tt/auth/internal/pg"
 	"github.com/daniilty/kanban-tt/schema"
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -35,35 +36,47 @@ func (s *ServiceImpl) Register(ctx context.Context, user *UserInfo) (string, Cod
 		return "", CodeInternal, err
 	}
 
-	key, err := generate.SecureToken(tokenLen)
-	if err != nil {
-		return "", CodeInternal, err
-	}
+	go func() {
+		const timeout = 10 * time.Second
 
-	now := time.Now()
+		log := ctx.Value("log").(*zap.SugaredLogger)
+		if log == nil {
+			log = zap.NewNop().Sugar()
+		}
 
-	err = s.db.AddToken(ctx, &pg.Token{
-		Key:       key,
-		UID:       int(resp.GetId()),
-		CreatedAt: &now,
-	})
-	if err != nil {
-		return "", CodeInternal, err
-	}
+		key, err := generate.SecureToken(tokenLen)
+		if err != nil {
+			log.Errorw("generate secure config", "err", err, "uid", resp.GetId())
+			return
+		}
 
-	confirmURL := generateConfirmLink(s.confirmURL, key)
+		now := time.Now()
 
-	err = s.kafkaProducer.SendMessage(ctx, &schema.Email{
-		To: user.Email,
-		Msg: `<div style="background-color: #e0e0e0; padding: 50px; border-radius: 10px; color: #8a8383; display: flex; align-items: center; flex-direction: column;">
+		err = s.db.AddToken(ctx, &pg.Token{
+			Key:       key,
+			UID:       int(resp.GetId()),
+			CreatedAt: &now,
+		})
+		if err != nil {
+			log.Errorw("add token", "err", err, "uid", resp.GetId())
+			return
+		}
+
+		confirmURL := generateConfirmLink(s.confirmURL, key)
+
+		err = s.kafkaProducer.SendMessage(ctx, &schema.Email{
+			To: user.Email,
+			Msg: `<div style="background-color: #e0e0e0; padding: 50px; border-radius: 10px; color: #8a8383; display: flex; align-items: center; flex-direction: column;">
 <h1>Welcome to Kanban Task Tracker!</h1>
 <strong>Please confirm your email with link below, or your account will be blocked in a week.</strong><br/><a style="background-color: #e0e0e0; padding: 20px; margin-top: 20px; border-radius: 23px; background: #E0E0E0; box-shadow: 10px 10px 20px #bebebe,-10px -10px 20px #ffffff; text-decoration: none;font-weight:bold;color: #8a8383" href="` +
-			confirmURL.String() +
-			`">Confirm email</a></div>`,
-	})
-	if err != nil {
-		return "", CodeInternal, err
-	}
+				confirmURL.String() +
+				`">Confirm email</a></div>`,
+		})
+		if err != nil {
+			log.Errorw("write to kafka", "err", err)
+			return
+		}
+	}()
 
 	uid := strconv.Itoa(int(resp.GetId()))
 

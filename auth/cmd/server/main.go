@@ -8,12 +8,14 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/daniilty/kanban-tt/auth/internal/core"
 	"github.com/daniilty/kanban-tt/auth/internal/jwt"
 	"github.com/daniilty/kanban-tt/auth/internal/kafka"
 	"github.com/daniilty/kanban-tt/auth/internal/pg"
 	"github.com/daniilty/kanban-tt/auth/internal/server"
+	"github.com/daniilty/kanban-tt/auth/internal/worker"
 	"github.com/daniilty/kanban-tt/schema"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -69,12 +71,19 @@ func run() error {
 	}
 
 	httpServer := server.NewHTTP(cfg.httpAddr, logger.Sugar(), service)
+	tokenCleaner := worker.NewTokensCleaner(30*time.Minute, db, logger.Sugar())
 
 	wg := &sync.WaitGroup{}
 
 	wg.Add(1)
 	go func(ctx context.Context) {
 		httpServer.Run(ctx)
+		wg.Done()
+	}(ctx)
+
+	wg.Add(1)
+	go func(ctx context.Context) {
+		tokenCleaner.Run(ctx)
 		wg.Done()
 	}(ctx)
 

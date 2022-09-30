@@ -42,3 +42,19 @@ func (d *db) DeleteToken(ctx context.Context, key string) error {
 
 	return err
 }
+
+func (d *db) DeleteTokenByUID(ctx context.Context, uid string) error {
+	const q = "delete from tokens where uid=$1"
+
+	_, err := d.db.ExecContext(ctx, q, uid)
+
+	return err
+}
+
+func (d *db) DeleteExpiredTokens(ctx context.Context) error {
+	const q = "delete from tokens where CURRENT_TIMESTAMP - created_at > '1 day'"
+
+	_, err := d.db.ExecContext(ctx, q)
+
+	return err
+}

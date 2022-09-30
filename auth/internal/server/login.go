@@ -37,16 +37,17 @@ func (l *loginRequest) validate() core.Code {
 // Login to your account
 //
 // parameters:
-//  + name: loginRequest
-//    in: body
-//    required: true
-//    type: loginRequest
+//   - name: loginRequest
+//     in: body
+//     required: true
+//     type: loginRequest
 //
 // Returns operation result
 // responses:
-//    200: accessTokenResponse
-//    400: errorResponse Bad request
-//    500: errorResponse Internal server error
+//
+//	200: accessTokenResponse
+//	400: errorResponse Bad request
+//	500: errorResponse Internal server error
 func (h *HTTP) login(w http.ResponseWriter, r *http.Request) {
 	resp := h.getLoginResponse(r)
 
@@ -73,7 +74,7 @@ func (h *HTTP) getLoginResponse(r *http.Request) response {
 	accessToken, code, err := h.service.Login(r.Context(), l.toService())
 	if err != nil {
 		if code == core.CodeInternal {
-			h.logger.Errorw("Login user.", "err", err)
+			h.log.Errorw("Login user.", "err", err)
 
 			return getInternalServerErrorResponse(code)
 		}

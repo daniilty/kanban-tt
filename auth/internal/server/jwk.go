@@ -7,6 +7,6 @@ func (h *HTTP) jwks(w http.ResponseWriter, r *http.Request) {
 
 	_, err := w.Write(h.service.JWKS())
 	if err != nil {
-		h.logger.Debugw("Write jwks.", "err", err)
+		h.log.Debugw("Write jwks.", "err", err)
 	}
 }

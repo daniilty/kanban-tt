@@ -9,6 +9,8 @@ import (
 func (h *HTTP) setRoutes(r *mux.Router) {
 	api := r.PathPrefix("/api/v1/auth").Subrouter()
 
+	api.Use(h.loggerMiddleware)
+
 	api.HandleFunc("/login",
 		h.login,
 	).Methods(http.MethodPost)

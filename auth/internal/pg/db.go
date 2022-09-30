@@ -11,6 +11,8 @@ type DB interface {
 	AddToken(context.Context, *Token) error
 	GetToken(context.Context, string) (*Token, error)
 	DeleteToken(context.Context, string) error
+	DeleteTokenByUID(context.Context, string) error
+	DeleteExpiredTokens(context.Context) error
 }
 
 func Connect(ctx context.Context, addr string) (DB, error) {
